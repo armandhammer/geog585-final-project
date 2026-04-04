@@ -31,7 +31,7 @@
             }
         }
 
-        $.getJSON("data/RipMapMRG.json", function (data, error) {
+        $.getJSON("data/RipMapMRG_small.json", function (data, error) {
             var geojsonLayer = new L.GeoJSON(data, {
                 onEachFeature: onEachFeature
             }).addTo(map);
