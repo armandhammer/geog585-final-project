@@ -796,38 +796,35 @@ function loadETData() {
 
     console.log("Loading ET data from:", ET_CSV_PATH);
 
-    d3.csv(ET_CSV_PATH, function (error, rows) {
+    // D3 version 5 changed d3.csv() to use Promises instead of callbacks.
+    // Old style (v4):  d3.csv(url, function(error, rows) { ... })
+    // New style (v5):  d3.csv(url).then(function(rows) { ... })
+    //                             .catch(function(error) { ... })
+    d3.csv(ET_CSV_PATH)
 
-        // If the file couldn't be loaded, log the error and stop
-        if (error) {
+        .then(function (rows) {
+            // This runs when the file loads successfully.
+            // "rows" is an array of objects, one per CSV row.
+
+            // d3.csv reads every value as a string — convert numbers
+            rows.forEach(function (row) {
+                row.poly_id = +row.poly_id;
+                row.year    = +row.year;
+                row.mean = isUsableNumber(row.mean) ? +row.mean : null;
+                row.p25  = isUsableNumber(row.p25)  ? +row.p25  : null;
+                row.p75  = isUsableNumber(row.p75)  ? +row.p75  : null;
+                row.npix = isUsableNumber(row.npix) ? +row.npix : null;
+            });
+
+            etData = rows;
+            console.log("ET data loaded successfully:", etData.length, "rows");
+        })
+
+        .catch(function (error) {
+            // This runs if the file couldn't be loaded
             console.error("ERROR: Could not load ET data:", error);
-            return;
-        }
-
-        // Loop through every row and convert strings to numbers
-        rows.forEach(function (row) {
-
-            // poly_id and year are always numbers, so convert directly
-            // The "+" in front is a quick way to convert string --> number
-            row.poly_id = +row.poly_id;
-            row.year    = +row.year;
-
-            // For mean/p25/p75/npix, check for "NA" first.
-            // If it's "NA", store null. Otherwise, convert to number.
-            row.mean = isUsableNumber(row.mean) ? +row.mean : null;
-            row.p25  = isUsableNumber(row.p25)  ? +row.p25  : null;
-            row.p75  = isUsableNumber(row.p75)  ? +row.p75  : null;
-            row.npix = isUsableNumber(row.npix) ? +row.npix : null;
         });
-
-        // Store the processed rows in our global etData array
-        etData = rows;
-
-        console.log("ET data loaded successfully:", etData.length, "rows");
-    });
 }
-
-
 
 
 /* ============================================================
