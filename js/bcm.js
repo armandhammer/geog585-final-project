@@ -504,10 +504,6 @@ $(document).ready(function () {
 
     console.log("Page loaded. Starting app setup...");
 
-    // Fix Leaflet's default image path so the layer-switcher icon loads correctly.
-    // Without this, Leaflet looks for images locally and gets a 404.
-    L.Icon.Default.imagePath = "https://unpkg.com/leaflet@1.7.1/dist/images/";
-
     // --- Phase 1: Build the map ---
     map = createLeafletMap();
     var satelliteLayer = createSatelliteBasemap();
