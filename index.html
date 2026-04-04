@@ -1,49 +1,390 @@
 <!DOCTYPE html>
+<!--
+    index.html  —  Riparian Ecosystems Map
+                   Middle Rio Grande  |  GEOG 585 Final Project
 
-<!DOCTYPE html>
+    WHAT THIS FILE DOES:
+    This is the main (and only) HTML file for our web map.
+    HTML files define the STRUCTURE of a web page — what
+    elements exist on the page and how they are organized.
+
+    This file does NOT contain any JavaScript logic or CSS styling.
+    Those are kept in separate files to keep things organized:
+
+      css/main.css  — controls the visual appearance (colors, sizes, layout)
+      js/bcm.js     — controls all the interactive behavior (map, charts, clicks)
+
+    HOW THE PAGE IS STRUCTURED:
+    The page is split into two halves, side by side:
+
+      LEFT SIDE  (40% width) — the interactive Leaflet map
+      RIGHT SIDE (60% width) — the info panel with polygon data
+
+    The info panel has several rows, one for each piece of data:
+      Row 1 — Panel title / header
+      Row 2 — Vegetation community name
+      Row 3 — % Tree cover
+      Row 4 — % Shrub cover
+      Row 5 — % Herbaceous cover
+      Row 6 — Area in acres
+      Row 7 — ET (Evapotranspiration) trend chart (D3)
+
+    HOW HTML, CSS, AND JS WORK TOGETHER:
+      HTML  says "there is a div with id=map"
+      CSS   says "the div#map should be 40% wide and full height"
+      JS    says "draw a Leaflet map inside div#map"
+
+    All three files must agree on element IDs and class names.
+-->
+
+
 <html>
 
 <head>
-    <title>Riparian Ecosystems Map</title>
-    <!-- javascript files -->
-    <script src="js/leaflet.js"></script>
-    <script src="js/jQuery.js"></script>
-    <!-- css files -->
+    <!--
+        The <head> section contains information ABOUT the page,
+        not content that appears on screen. This includes the
+        page title, and links to our CSS and JavaScript files.
+    -->
+
+    <!-- The title appears in the browser tab, not on the page itself -->
+    <title>Riparian Ecosystems Map — Middle Rio Grande</title>
+
+
+    <!-- ===========================================================
+         CSS FILES  (load in <head>, before the page content)
+
+         We load CSS files here so the browser knows how to style
+         everything before it draws it on screen. This prevents
+         a "flash of unstyled content" (elements appearing briefly
+         without any styling before CSS loads).
+
+         ORDER MATTERS: Our main.css loads LAST so it can override
+         any default styles from the library CSS files.
+    =========================================================== -->
+
+    <!--
+        leaflet.css — Required by the Leaflet mapping library.
+        Styles the map container, zoom buttons, popups, and other
+        map controls. Must be loaded before leaflet.js.
+    -->
     <link rel="stylesheet" href="css/leaflet.css" />
-    <style>
-        #mapId {
-            width: 900px;
-            height: 500px;
-        }
-    </style>
+
+    <!--
+        bootstrap.css — The Bootstrap layout framework.
+        Provides a responsive grid system and utility classes
+        that help us structure the page layout.
+    -->
+    <link rel="stylesheet" href="css/bootstrap.css" />
+
+    <!--
+        dc.css — Styles for DC.js interactive charts.
+        Included here for potential future DC.js charts.
+        (Currently our charts use plain D3.)
+    -->
+    <link rel="stylesheet" href="css/dc.css" />
+
+    <!--
+        main.css — OUR custom stylesheet.
+        Loaded last so our styles take priority over the
+        library defaults above. This is where we define the
+        40/60 split layout, info panel row colors, etc.
+    -->
+    <link rel="stylesheet" href="css/main.css" />
+
 </head>
 
+
 <body>
+    <!--
+        The <body> section contains everything the user actually
+        sees on the page — the map, the info panel, all the text.
 
-    <div id="mapId"></div>
+        We use <div> elements as containers to organize the layout.
+        A <div> on its own does nothing visually — it's an invisible
+        box. CSS (in main.css) gives these boxes their sizes,
+        colors, and positions.
 
-    <script>
-
-        function onEachFeature(feature, layer) {
-            // does this feature have a property named popupContent?
-            if (feature.properties && feature.properties.popupContent) {
-                layer.bindPopup(feature.properties.popupContent);
-            }
-        }
-
-        $.getJSON("data/RipMapMRG_small.geojson", function (data, error) {
-            var geojsonLayer = new L.GeoJSON(data, {
-                onEachFeature: onEachFeature
-            }).addTo(map);
-        });
+        We identify divs with "id" attributes (e.g. id="map").
+        IDs let CSS and JavaScript find and target specific elements.
+    -->
 
 
-        var CyclOSM = L.tileLayer('https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png', {
-            maxZoom: 20,
-            attribution: '<a href="https://github.com/cyclosm/cyclosm-cartocss-style/releases" title="CyclOSM - Open Bicycle render">CyclOSM</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        })
+    <!-- ===========================================================
+         MAIN CONTAINER
+         This is the outermost wrapper div for everything on screen.
+         In main.css, #main-container uses "display: flex" to place
+         the map and info panel side by side automatically.
+    =========================================================== -->
+    <div id="main-container">
 
-        var map = L.map('mapId').setView([35.106766, -106.629181], 10);
 
-        CyclOSM.addTo(map);
-    </script>
+        <!-- =======================================================
+             LEFT SIDE — MAP CONTAINER  (40% of page width)
+
+             This div holds the Leaflet map.
+             It's sized to 40% width in main.css (#map-container).
+
+             The inner div (#map) is where Leaflet actually draws
+             the interactive map. Leaflet finds it using the id "map"
+             — see bcm.js, Step 1: createLeafletMap().
+
+             "position: relative" on the container (set in CSS) is
+             required so that Leaflet's controls (zoom buttons,
+             layer switcher, our dropdown) position themselves
+             correctly inside the map boundaries.
+        ======================================================= -->
+        <div id="map-container">
+            <div id="map">
+                <!-- Leaflet fills this div with the interactive map.
+                     We leave it empty — bcm.js handles everything. -->
+            </div>
+        </div>
+        <!-- end #map-container -->
+
+
+        <!-- =======================================================
+             RIGHT SIDE — INFO PANEL  (60% of page width)
+
+             This div holds all the data display rows.
+             It's sized to 60% width in main.css (#info-panel).
+
+             Each child div is one "row" in the panel.
+             CSS stacks them vertically (flex-direction: column)
+             and gives each one a different background color.
+
+             The spans inside each row have two jobs:
+               .info-label — the field name (left/top side)
+               .info-value — the actual data (right/bottom side)
+
+             JavaScript (bcm.js) updates the .info-value spans
+             by targeting their "id" attributes with jQuery:
+               e.g. $("#info-tree").text("42.5%")
+        ======================================================= -->
+        <div id="info-panel">
+
+
+            <!-- ---------------------------------------------------
+                 ROW 1 — PANEL HEADER
+                 A simple title bar. No data here — just labels.
+                 Background: deep forest green (see #row-header in main.css)
+            --------------------------------------------------- -->
+            <div class="info-row" id="row-header">
+                <span class="header-title">Riparian Ecosystems Info Panel</span>
+                <span class="header-subtitle">Middle Rio Grande</span>
+            </div>
+
+
+            <!-- ---------------------------------------------------
+                 ROW 2 — VEGETATION COMMUNITY NAME
+                 Shows the VegetationCommunityName field from the
+                 GeoJSON when a polygon is clicked.
+                 Background: medium green
+
+                 Default text: set by showDefaultInfoPanel() in bcm.js
+                 Updated by:   updateInfoPanel() in bcm.js
+                 Target id:    #info-name
+            --------------------------------------------------- -->
+            <div class="info-row" id="row-name">
+                <span class="info-label">Vegetation Type</span>
+                <span class="info-value" id="info-name">
+                    ← Click a polygon on the map to see details
+                </span>
+            </div>
+
+
+            <!-- ---------------------------------------------------
+                 ROW 3 — TREE COVER PERCENTAGE
+                 Shows the Tot_Tree_Cov field from the GeoJSON,
+                 formatted as a percentage (e.g. "6.7%").
+                 Background: lighter green
+
+                 Default text: "--"  (two dashes = no data yet)
+                 Updated by:   updateInfoPanel() in bcm.js
+                 Target id:    #info-tree
+            --------------------------------------------------- -->
+            <div class="info-row" id="row-tree">
+                <span class="info-label">🌲 Tree Cover</span>
+                <span class="info-value" id="info-tree">--</span>
+            </div>
+
+
+            <!-- ---------------------------------------------------
+                 ROW 4 — SHRUB COVER PERCENTAGE
+                 Shows the Tot_Shrub_Cov field from the GeoJSON.
+                 Background: warm tan-green
+
+                 Target id: #info-shrub
+            --------------------------------------------------- -->
+            <div class="info-row" id="row-shrub">
+                <span class="info-label">🌿 Shrub Cover</span>
+                <span class="info-value" id="info-shrub">--</span>
+            </div>
+
+
+            <!-- ---------------------------------------------------
+                 ROW 5 — HERBACEOUS COVER PERCENTAGE
+                 Shows the Tot_Herb_Cov field from the GeoJSON.
+                 Background: pale yellow-green
+
+                 Target id: #info-herb
+            --------------------------------------------------- -->
+            <div class="info-row" id="row-herb">
+                <span class="info-label">🌱 Herbaceous Cover</span>
+                <span class="info-value" id="info-herb">--</span>
+            </div>
+
+
+            <!-- ---------------------------------------------------
+                 ROW 6 — AREA IN ACRES
+                 Shows the polygon's size in acres.
+                 Calculated from Shape_Area (square degrees) in bcm.js
+                 using the convertSquareDegreesToAcres() function.
+                 Background: soft slate blue
+
+                 Target id: #info-acres
+            --------------------------------------------------- -->
+            <div class="info-row" id="row-acres">
+                <span class="info-label">📐 Area</span>
+                <span class="info-value" id="info-acres">--</span>
+            </div>
+
+
+            <!-- ---------------------------------------------------
+                 ROW 7 — EVAPOTRANSPIRATION (ET) TREND CHART
+                 This row is taller than the others to give the
+                 D3 chart enough room to display properly.
+                 (Controlled by "flex: 3" in main.css #row-et)
+
+                 The inner div (#et-chart) is where D3 draws
+                 the SVG chart. bcm.js completely manages the
+                 contents of this div:
+                   - Before a polygon is clicked: placeholder text
+                   - After a polygon is clicked: a D3 line chart
+
+                 See drawETChart() in bcm.js for how the chart
+                 is built and drawn inside this div.
+            --------------------------------------------------- -->
+            <div class="info-row" id="row-et">
+                <span class="info-label">📈 ET Trend (2013–2024)</span>
+
+                <!--
+                    #et-chart is the target div for D3.
+                    bcm.js will call $("#et-chart").empty() to clear it,
+                    then append an <svg> element with the chart.
+                    We pre-fill it with placeholder text that shows
+                    before any polygon has been clicked.
+                -->
+                <div id="et-chart">
+                    <div class="et-placeholder">
+                        Select a polygon to view its ET trend
+                    </div>
+                </div>
+
+            </div>
+            <!-- end #row-et -->
+
+
+        </div>
+        <!-- end #info-panel -->
+
+
+    </div>
+    <!-- end #main-container -->
+
+
+    <!-- ===========================================================
+         JAVASCRIPT FILES  (load at bottom of <body>)
+
+         We load JavaScript at the BOTTOM of the page, not in
+         the <head>. Here's why:
+
+         The browser reads HTML top to bottom. If we put <script>
+         tags in the <head>, JavaScript would run before the HTML
+         elements (like our divs) exist yet — and our code would
+         fail trying to find elements that haven't been created.
+
+         By loading scripts at the very bottom, we guarantee that
+         all the HTML above has already been built before any
+         JavaScript runs.
+
+         ORDER MATTERS: Libraries must load before our custom code.
+         Our code (bcm.js) uses functions from all these libraries,
+         so they must all be available first.
+
+         Think of it like a recipe: you need the ingredients
+         (libraries) before you can cook (run bcm.js).
+    =========================================================== -->
+
+    <!--
+        jQuery — simplifies HTML manipulation and AJAX (file loading).
+        We use it for:
+          - $.getJSON()  to load our GeoJSON file
+          - $()          to find and update info panel elements
+          - $(document).ready()  to wait for the page to load
+        Must load before leaflet.js and bcm.js.
+    -->
+    <script src="js/jQuery.js"></script>
+
+    <!--
+        Leaflet — the interactive mapping library.
+        We use it for:
+          - Creating the map
+          - Loading and displaying GeoJSON polygons
+          - Adding tile layers (basemaps)
+          - Custom map controls (our choropleth dropdown)
+        Requires leaflet.css (loaded in <head>) to work correctly.
+    -->
+    <script src="js/leaflet.js"></script>
+
+    <!--
+        D3 (Data-Driven Documents) — the data visualization library.
+        We use it for:
+          - Drawing the ET line chart (SVG)
+          - Color scales for the choropleth
+          - Loading the ET CSV file (d3.csv())
+        Must load before dc.js (which depends on D3).
+    -->
+    <script src="js/d3.js"></script>
+
+    <!--
+        Crossfilter — a fast multi-dimensional data filtering library.
+        Loaded here for potential future use with DC.js charts.
+        DC.js requires crossfilter to work.
+    -->
+    <script src="js/crossfilter.js"></script>
+
+    <!--
+        Underscore.js — a utility library with helpful functions
+        for working with arrays and objects.
+        DC.js requires underscore to work.
+    -->
+    <script src="js/underscore-min.js"></script>
+
+    <!--
+        DC.js — a charting library built on top of D3 and Crossfilter.
+        Makes it easy to build charts that filter each other
+        interactively. Loaded here for potential future use.
+        Requires d3.js, crossfilter.js, and underscore-min.js above.
+    -->
+    <script src="js/dc.js"></script>
+
+    <!--
+        bcm.js — OUR custom script. Loaded LAST because it uses
+        all of the libraries above. If it loaded first, calls like
+        L.map() (Leaflet) or d3.csv() (D3) would fail because
+        those libraries wouldn't exist yet.
+
+        This file contains all of our app logic:
+          - Building the Leaflet map
+          - Loading and displaying the GeoJSON
+          - Choropleth coloring
+          - Polygon selection and highlighting
+          - Info panel updates
+          - ET chart drawing
+    -->
+    <script src="js/bcm.js"></script>
+
+
+</body>
+</html>
