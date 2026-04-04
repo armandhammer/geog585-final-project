@@ -1,0 +1,566 @@
+/* ============================================================
+
+   bcm.css  —  Custom Stylesheet for the Riparian Ecosystems Map
+               Middle Rio Grande  |  GEOG 585 Final Project
+
+   WHAT THIS FILE DOES:
+   This file controls the VISUAL APPEARANCE of everything on
+   the page — sizes, colors, spacing, and layout.
+
+   The actual content (divs, text) is defined in index.html.
+   The interactive behavior is handled in bcm.js.
+   This file just makes it look right.
+
+   HOW CSS WORKS (quick reminder):
+   CSS rules have two parts:
+     1. A "selector" that targets an HTML element
+          #map          targets <div id="map">
+          .info-row     targets any element with class="info-row"
+          body          targets the whole page body
+     2. A block of "properties" that describe how it looks
+          width: 40%;       set the width to 40% of its container
+          background: red;  set the background color to red
+
+   HOW THIS FILE IS ORGANIZED:
+     PART 1 — Global reset  (remove browser defaults)
+     PART 2 — Page layout   (the 40/60 left/right split)
+     PART 3 — Map area      (left side)
+     PART 4 — Choropleth dropdown control (sits on top of map)
+     PART 5 — Info panel    (right side)
+     PART 6 — Info panel rows  (each data row's colors and spacing)
+     PART 7 — ET chart area
+     PART 8 — Responsive layout  (for small/narrow screens)
+
+   ============================================================ */
+
+
+
+
+/* ============================================================
+
+   PART 1: GLOBAL RESET
+
+   Every browser has built-in "default" styles — for example,
+   Chrome adds a small white margin around the page by default.
+   We override those here so our layout starts from a clean slate.
+
+   ============================================================ */
+
+/*
+   Target: the <html> and <body> elements (the entire page)
+
+   height: 100%  — make the page fill the full browser window height.
+                   Without this, the page would only be as tall as
+                   its content, leaving empty space below.
+
+   margin: 0     — remove the browser's default white border
+   padding: 0      around the edges of the page.
+*/
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;   /* default font for all text on the page */
+    font-size: 15px;                  /* default text size */
+}
+
+
+
+
+/* ============================================================
+
+   PART 2: PAGE LAYOUT — THE 40/60 SPLIT
+
+   We use CSS "Flexbox" to place the map and info panel
+   side by side. Flexbox is a modern layout system that makes
+   it easy to divide space between elements.
+
+   The key property is "display: flex" on the container.
+   This tells the browser: "arrange my children side by side."
+
+   ============================================================ */
+
+/*
+   Target: #main-container (the outermost wrapper div in index.html)
+
+   display: flex    — turns on flexbox, placing children side by side
+   width: 100vw     — fill 100% of the Viewport Width (vw = viewport width)
+   height: 100vh    — fill 100% of the Viewport Height (vh = viewport height)
+                      Together, this makes the container fill the entire
+                      browser window exactly, with no overflow or gaps.
+*/
+#main-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+
+
+
+/* ============================================================
+
+   PART 3: THE MAP AREA (LEFT SIDE, 40% WIDTH)
+
+   ============================================================ */
+
+/*
+   Target: #map-container (the outer wrapper for the map)
+
+   width: 40%         — take up 40% of the page width.
+                         The info panel will automatically get the
+                         remaining 60% (see #info-panel below).
+
+   position: relative — required by Leaflet. Without this, Leaflet's
+                         controls (zoom buttons, layer switcher, our
+                         choropleth dropdown) would position themselves
+                         relative to the whole page instead of just the
+                         map area, and would appear in the wrong place.
+
+   flex-shrink: 0     — tells flexbox "do not shrink the map below 40%
+                         width, even if the screen is narrow."
+                         Without this, flexbox might squeeze the map.
+*/
+#map-container {
+    width: 40%;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/*
+   Target: #map (the inner div where Leaflet draws the actual map)
+
+   width: 100%   — fill the full width of #map-container (which is 40%)
+   height: 100%  — fill the full height of #map-container (which is 100vh)
+
+   Leaflet requires the map div to have an explicit height.
+   Without height: 100%, the map div would have zero height
+   and nothing would appear on screen.
+*/
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+
+
+
+/* ============================================================
+
+   PART 4: CHOROPLETH DROPDOWN CONTROL
+
+   This control appears in the top-left corner of the map.
+   It's created programmatically in bcm.js (addChoroplethDropdown)
+   and styled here.
+
+   The class "choropleth-control" is applied by Leaflet when
+   we call L.DomUtil.create("div", "choropleth-control") in bcm.js.
+
+   ============================================================ */
+
+/*
+   Target: .choropleth-control (the dropdown wrapper div on the map)
+
+   background: white        — white box so it stands out over the map
+   padding: 8px 12px        — space inside the box (top/bottom: 8px, left/right: 12px)
+   border-radius: 6px       — rounded corners
+   box-shadow: ...          — a soft drop shadow to lift it off the map visually
+   font-size: 13px          — slightly smaller text than the page default
+   line-height: 1.6         — a bit of extra space between lines of text
+*/
+.choropleth-control {
+    background: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/*
+   Target: the <label> inside .choropleth-control
+
+   display: block   — makes the label take up its own full line,
+                       so the dropdown appears below it (not beside it)
+   font-weight: bold — make the "Color map by:" text bold
+   margin-bottom: 4px — a small gap between the label and dropdown
+*/
+.choropleth-control label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #333;
+}
+
+/*
+   Target: the <select> dropdown inside .choropleth-control
+
+   width: 100%   — make the dropdown as wide as its container
+   padding: 3px 4px — small padding inside the dropdown
+   cursor: pointer — show a hand cursor when hovering (feels more clickable)
+*/
+.choropleth-control select {
+    width: 100%;
+    padding: 3px 4px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+
+
+
+/* ============================================================
+
+   PART 5: THE INFO PANEL (RIGHT SIDE, 60% WIDTH)
+
+   ============================================================ */
+
+/*
+   Target: #info-panel (the right side container)
+
+   width: 60%               — take up the remaining 60% of page width.
+                               (The map takes 40%, so 40% + 60% = 100%)
+
+   display: flex            — use flexbox AGAIN, this time to stack
+   flex-direction: column     the info rows VERTICALLY (column = top to bottom).
+                               Without flex-direction: column, the rows
+                               would try to go side by side.
+
+   overflow-y: auto         — if the content is taller than the panel,
+                               show a vertical scrollbar instead of overflowing
+                               off the edge of the screen.
+*/
+#info-panel {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+
+
+
+/* ============================================================
+
+   PART 6: INFO PANEL ROWS
+
+   Each row in the info panel has:
+     1. A shared base style (.info-row) that applies to ALL rows
+     2. An individual ID style (#row-tree, etc.) for its unique color
+
+   ============================================================ */
+
+/* ---- BASE STYLE: applies to every .info-row div ---- */
+
+/*
+   Target: any element with class="info-row"
+
+   display: flex           — use flexbox to control how the label
+   flex-direction: column    and value are arranged within the row.
+                             "column" stacks the label above the value.
+
+   justify-content: center — center the content vertically within the row
+
+   padding: 14px 24px      — space inside the row (top/bottom: 14px, sides: 24px)
+
+   flex: 1                 — this is the key property for equal height rows!
+                             "flex: 1" tells each row to take an equal share
+                             of the available vertical space in the info panel.
+                             All rows with flex: 1 will be the same height.
+                             Rows with flex: 3 (like the ET chart row) will
+                             be 3x taller than the others.
+
+   min-height: 60px        — even with flex: 1, never shrink below 60px tall.
+                             Prevents rows from becoming too small to read.
+
+   border-bottom: ...      — a subtle dividing line between rows
+*/
+.info-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 14px 24px;
+    flex: 1;
+    min-height: 60px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/*
+   Target: the .info-label span inside each row (the field name)
+
+   font-weight: bold        — make the label bold
+   font-size: 13px          — slightly smaller than the value text
+   text-transform: uppercase — "tree cover" → "TREE COVER"
+   letter-spacing: 0.05em  — a tiny bit of extra space between letters,
+                              which looks good with uppercase text
+   opacity: 0.75            — slightly faded so it doesn't compete
+                              visually with the value text
+   margin-bottom: 4px       — gap between label and value
+*/
+.info-label {
+    font-weight: bold;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.75;
+    margin-bottom: 4px;
+}
+
+/*
+   Target: the .info-value span inside each row (the actual data)
+
+   font-size: 18px     — large and easy to read
+   font-weight: 600    — semi-bold (between normal and bold)
+*/
+.info-value {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+
+/* ---- INDIVIDUAL ROW COLORS ---- */
+/*
+   Each row gets its own background color from a coordinated
+   earthy/nature palette. Colors go from dark green at the top
+   to light colors at the bottom, creating a natural gradient.
+
+   Text colors are chosen for good contrast against each background.
+   (Dark text on light backgrounds, light text on dark backgrounds.)
+*/
+
+/*
+   ROW 1: Header — deep forest green
+   flex: 0 0 80px  — "0 0 80px" means: don't grow, don't shrink,
+                      be exactly 80px tall. This overrides the
+                      flex: 1 from .info-row, giving the header
+                      a fixed height instead of a flexible one.
+*/
+#row-header {
+    background-color: #1b4332;    /* deep forest green */
+    color: white;
+    flex: 0 0 80px;               /* fixed height: always exactly 80px */
+    flex-direction: column;
+    align-items: center;          /* center content horizontally */
+    justify-content: center;
+    text-align: center;
+    padding: 12px 24px;
+}
+
+/* The large title text in the header */
+.header-title {
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+}
+
+/* The smaller subtitle text below the title */
+.header-subtitle {
+    font-size: 13px;
+    opacity: 0.75;
+    margin-top: 3px;
+}
+
+/*
+   ROW 2: Vegetation name — medium green
+   min-height: 70px  — slightly taller than other rows because
+                        vegetation names can be long text strings
+*/
+#row-name {
+    background-color: #40916c;    /* medium green */
+    color: white;
+    min-height: 70px;
+}
+
+/* The vegetation name value is italic to distinguish it visually */
+#row-name .info-value {
+    font-size: 16px;
+    font-style: italic;
+}
+
+/*
+   ROW 3: Tree cover — lighter, brighter green
+*/
+#row-tree {
+    background-color: #74c69d;    /* light green */
+    color: #1b4332;               /* dark green text for contrast */
+}
+
+/*
+   ROW 4: Shrub cover — warm green
+*/
+#row-shrub {
+    background-color: #b7e4c7;    /* soft warm green */
+    color: #2d4a1e;               /* dark earthy green text */
+}
+
+/*
+   ROW 5: Herbaceous cover — pale yellow-green
+*/
+#row-herb {
+    background-color: #d8f3dc;    /* very pale green */
+    color: #2d4a1e;
+}
+
+/*
+   ROW 6: Area in acres — soft slate blue
+   (a different color family to visually separate the "size"
+    information from the "cover" information above it)
+*/
+#row-acres {
+    background-color: #a8c5da;    /* soft blue-grey */
+    color: #1a3a4a;               /* dark blue-grey text */
+}
+
+/*
+   ROW 7: ET chart — light neutral grey
+   flex: 3  — this row gets 3x the height of the other rows
+               because the chart needs space to be readable.
+               (Other rows have flex: 1, this one has flex: 3,
+                so this row is roughly 3x taller.)
+   min-height: 220px  — minimum height even if the panel is short
+*/
+#row-et {
+    background-color: #f4f4f4;    /* light grey */
+    color: #333;
+    flex: 3;
+    min-height: 220px;
+}
+
+/* The label in the ET row uses a slightly darker color */
+#row-et .info-label {
+    color: #555;
+}
+
+
+
+
+/* ============================================================
+
+   PART 7: THE ET CHART AREA
+
+   The D3 chart is drawn inside #et-chart by bcm.js.
+   We style the container and the placeholder text here.
+
+   ============================================================ */
+
+/*
+   Target: #et-chart (the div where D3 draws the SVG chart)
+
+   width: 100%    — fill the full width of the ET row
+   flex: 1        — take up remaining vertical space in the row
+                    (after the label takes its space)
+   margin-top: 8px — small gap between the label and the chart
+*/
+#et-chart {
+    width: 100%;
+    flex: 1;
+    margin-top: 8px;
+}
+
+/*
+   Target: .et-placeholder (shown before a polygon is selected,
+           or when ET data is unavailable for a polygon)
+
+   display: flex           — center the text inside the box
+   align-items: center
+   justify-content: center
+
+   height: 160px           — give the placeholder a visible height
+   border: 2px dashed #bbb — dashed border to suggest "empty space"
+   border-radius: 8px      — rounded corners
+   color: #999             — grey text (not urgent, just informational)
+   font-style: italic      — italic text suggests it's placeholder content
+   background: white       — white box stands out from the grey row background
+*/
+.et-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 160px;
+    border: 2px dashed #bbb;
+    border-radius: 8px;
+    color: #999;
+    font-style: italic;
+    font-size: 14px;
+    background-color: white;
+}
+
+/*
+   Target: any <svg> element inside #et-chart
+   (D3 creates this element when drawing the chart)
+
+   width: 100%    — make the SVG fill the available width.
+                    D3 sets the absolute pixel width when it
+                    creates the SVG, but this CSS ensures it
+                    doesn't overflow its container.
+*/
+#et-chart svg {
+    width: 100%;
+}
+
+/*
+   Target: axis tick label text inside the chart
+   (D3 adds these as <text> elements inside .axis groups)
+*/
+#et-chart .axis text {
+    font-size: 11px;
+    fill: #555;     /* "fill" is SVG's version of "color" for text */
+}
+
+/*
+   Target: the axis lines and tick marks inside the chart
+   (D3 draws these as <line> and <path> elements inside .axis groups)
+*/
+#et-chart .axis line,
+#et-chart .axis path {
+    stroke: #aaa;   /* "stroke" is SVG's version of "border-color" */
+}
+
+
+
+
+/* ============================================================
+
+   PART 8: RESPONSIVE LAYOUT
+
+   CSS "@media" rules let us apply different styles depending
+   on the screen size. This is called "responsive design."
+
+   Without this, our side-by-side layout would be very cramped
+   on a phone screen. On small screens, we stack the map above
+   the info panel instead of putting them side by side.
+
+   "max-width: 700px" means:
+   "apply these rules only when the screen is 700px wide or less"
+
+   ============================================================ */
+
+@media (max-width: 700px) {
+
+    /*
+       On small screens, change the flex direction to "column"
+       so the map and info panel stack vertically (map on top,
+       panel below) instead of side by side.
+    */
+    #main-container {
+        flex-direction: column;
+        height: auto;       /* let the height grow naturally (not fixed to 100vh) */
+    }
+
+    /*
+       Give the map half the screen height on small screens.
+       "50vh" = 50% of the viewport height.
+       Without an explicit height here, the map might collapse to zero.
+    */
+    #map-container {
+        width: 100%;        /* full width (not 40%) on small screens */
+        height: 50vh;
+    }
+
+    /*
+       The info panel takes the full width too on small screens.
+    */
+    #info-panel {
+        width: 100%;
+    }
+}
