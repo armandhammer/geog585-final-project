@@ -50,7 +50,7 @@ html, body {
    themselves relative to the map container, not the whole page.
 */
 #map-container {
-    width: 40%;
+    width: 60%;
     height: 100vh;
     position: relative;
     flex-shrink: 0;
