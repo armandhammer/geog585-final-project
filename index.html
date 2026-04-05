@@ -71,36 +71,30 @@
                 <span class="info-value" id="info-herb">--</span>
             </div> -->
 
-            <!-- Row 3: Percent Vegetation Cover (three columns in one row) -->
-            <div class="info-row" id="row-veg-cover">
+            <!-- Row 3a: Vegetation cover section header -->
+            <div class="info-row" id="row-veg-header">
+                Percent Vegetation Cover
+            </div>
 
-                <!-- Section header spans all three columns -->
-                <span class="info-label veg-cover-header">Percent Vegetation Cover</span>
+            <!-- Row 3b: Three side-by-side cells, one per vegetation type -->
+            <div id="row-veg-cover">
 
-                <!-- Three-column container -->
-                <div class="veg-cover-columns">
+                <div class="veg-cell" id="cell-tree">
+                    <span class="veg-type">Tree</span>
+                    <span class="info-value" id="info-tree">--</span>
+                </div>
 
-                    <!-- Column 1: Tree -->
-                    <div class="veg-cover-block">
-                        <span class="veg-cover-type">Tree</span>
-                        <span class="info-value" id="info-tree">--</span>
-                    </div>
+                <div class="veg-cell" id="cell-shrub">
+                    <span class="veg-type">Shrub</span>
+                    <span class="info-value" id="info-shrub">--</span>
+                </div>
 
-                    <!-- Column 2: Shrub -->
-                    <div class="veg-cover-block">
-                        <span class="veg-cover-type">Shrub</span>
-                        <span class="info-value" id="info-shrub">--</span>
-                    </div>
+                <div class="veg-cell" id="cell-herb">
+                    <span class="veg-type">Herbaceous</span>
+                    <span class="info-value" id="info-herb">--</span>
+                </div>
 
-                    <!-- Column 3: Herbaceous -->
-                    <div class="veg-cover-block">
-                        <span class="veg-cover-type">Herbaceous</span>
-                        <span class="info-value" id="info-herb">--</span>
-                    </div>
-
-                </div><!-- end .veg-cover-columns -->
-
-            </div><!-- end #row-veg-cover -->
+            </div>
             <!-- Row 6: Area in acres -->
             <div class="info-row" id="row-acres">
                 <span class="info-label">Area</span>
