@@ -10,7 +10,6 @@
       js/bcm.js    - all interactive behavior
 -->
 <html>
-
 <head>
 
     <title>Riparian Ecosystems Map - Middle Rio Grande</title>
@@ -22,7 +21,6 @@
     <link rel="stylesheet" href="css/bcm.css" />
 
 </head>
-
 <body>
 
     <!-- #main-container: bcm.css uses flexbox here to place map and panel side by side -->
@@ -53,48 +51,24 @@
                 </span>
             </div>
 
-            <!--        stacked rows option     
+            <!-- Row 3: Tree cover -->
             <div class="info-row" id="row-tree">
                 <span class="info-label">Tree Cover</span>
                 <span class="info-value" id="info-tree">--</span>
             </div>
 
-            
+            <!-- Row 4: Shrub cover -->
             <div class="info-row" id="row-shrub">
                 <span class="info-label">Shrub Cover</span>
                 <span class="info-value" id="info-shrub">--</span>
             </div>
 
-            
+            <!-- Row 5: Herbaceous cover -->
             <div class="info-row" id="row-herb">
                 <span class="info-label">Herbaceous Cover</span>
                 <span class="info-value" id="info-herb">--</span>
-            </div> -->
-
-            <!-- Row 3a: Vegetation cover section header -->
-            <div class="info-row" id="row-veg-header">
-                Percent Vegetation Cover
             </div>
 
-            <!-- Row 3b: Three side-by-side cells, one per vegetation type -->
-            <div id="row-veg-cover">
-
-                <div class="veg-cell" id="cell-tree">
-                    <span class="veg-type">Tree</span>
-                    <span class="info-value" id="info-tree">--</span>
-                </div>
-
-                <div class="veg-cell" id="cell-shrub">
-                    <span class="veg-type">Shrub</span>
-                    <span class="info-value" id="info-shrub">--</span>
-                </div>
-
-                <div class="veg-cell" id="cell-herb">
-                    <span class="veg-type">Herbaceous</span>
-                    <span class="info-value" id="info-herb">--</span>
-                </div>
-
-            </div>
             <!-- Row 6: Area in acres -->
             <div class="info-row" id="row-acres">
                 <span class="info-label">Area</span>
@@ -128,5 +102,4 @@
     <script src="js/bcm.js"></script>
 
 </body>
-
 </html>
