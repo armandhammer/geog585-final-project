@@ -156,21 +156,20 @@ body {
 #row-veg-cover {
     display: flex;
     flex-direction: row;
+    flex: 1;            /* lets it participate in the info panel's height */
+    min-height: 60px;   /* guarantees it has enough room to show the cells */
     margin: 4px;
     padding: 0;
 }
 
-/* Each of the three cells */
 .veg-cell {
     flex: 1;
-    /* each cell takes equal 1/3 of the width */
     display: flex;
     flex-direction: column;
-    /* stack the type label above the % value */
     align-items: center;
+    min-height: 50px;   /* guarantees each cell has enough height to show content */
     margin: 4px;
     padding: 0;
-    /* no border, no border-radius */
 }
 
 /* Individual cell colors -- same as the original stacked rows */
