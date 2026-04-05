@@ -3,7 +3,7 @@
 
    ORGANIZATION:
    Part 1 - Global reset
-   Part 2 - Page layout (the 40/60 split)
+   Part 2 - Page layout (the 60/40 split)
    Part 3 - Map area (left side)
    Part 4 - Choropleth dropdown control
    Part 5 - Info panel (right side)
@@ -41,7 +41,7 @@ html, body {
 
 
 /* ============================================================
-   PART 3: MAP AREA (left side, 40% width)
+   PART 3: MAP AREA (left side, 60% width)
    ============================================================ */
 
 /*
