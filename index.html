@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <!--
-    index.html  —  Riparian Ecosystems Map  |  GEOG 585 Final Project
+    index.html  -  Riparian Ecosystems Map  |  GEOG 585 Final Project
 
-    Left side  (40%) — Leaflet map
-    Right side (60%) — Info panel with polygon data
+    Left side  (40%) - Leaflet map
+    Right side (60%) - Info panel with polygon data
 
     Connected files:
-      css/bcm.css  — layout and styles
-      js/bcm.js    — all interactive behavior
+      css/bcm.css  - layout and styles
+      js/bcm.js    - all interactive behavior
 -->
 <html>
+
 <head>
 
-    <title>Riparian Ecosystems Map — Middle Rio Grande</title>
+    <title>Riparian Ecosystems Map - Middle Rio Grande</title>
 
-    <!-- CSS loads in <head> so elements are styled before appearing on screen.
+    <!-- CSS loads in head so elements are styled before appearing on screen.
          bcm.css loads last so our styles can override library defaults. -->
     <link rel="stylesheet" href="css/leaflet.css" />
     <link rel="stylesheet" href="css/bootstrap.css" />
     <link rel="stylesheet" href="css/bcm.css" />
 
 </head>
+
 <body>
 
     <!-- #main-container: bcm.css uses flexbox here to place map and panel side by side -->
@@ -47,31 +49,61 @@
             <div class="info-row" id="row-name">
                 <span class="info-label">Vegetation Type</span>
                 <span class="info-value" id="info-name">
-                    ← Click a polygon on the map to see details
+                    Click a polygon on the map to see details
                 </span>
             </div>
 
-            <!-- Row 3: Tree cover -->
+            <!--        stacked rows option     
             <div class="info-row" id="row-tree">
-                <span class="info-label">🌲 Tree Cover</span>
+                <span class="info-label">Tree Cover</span>
                 <span class="info-value" id="info-tree">--</span>
             </div>
 
-            <!-- Row 4: Shrub cover -->
+            
             <div class="info-row" id="row-shrub">
-                <span class="info-label">🌿 Shrub Cover</span>
+                <span class="info-label">Shrub Cover</span>
                 <span class="info-value" id="info-shrub">--</span>
             </div>
 
-            <!-- Row 5: Herbaceous cover -->
+            
             <div class="info-row" id="row-herb">
-                <span class="info-label">🌱 Herbaceous Cover</span>
+                <span class="info-label">Herbaceous Cover</span>
                 <span class="info-value" id="info-herb">--</span>
-            </div>
+            </div> -->
 
+            <!-- Row 3: Percent Vegetation Cover (three columns in one row) -->
+            <div class="info-row" id="row-veg-cover">
+
+                <!-- Section header spans all three columns -->
+                <span class="info-label veg-cover-header">🌿 Percent Vegetation Cover</span>
+
+                <!-- Three-column container -->
+                <div class="veg-cover-columns">
+
+                    <!-- Column 1: Tree -->
+                    <div class="veg-cover-block">
+                        <span class="veg-cover-type">Tree</span>
+                        <span class="info-value" id="info-tree">--</span>
+                    </div>
+
+                    <!-- Column 2: Shrub -->
+                    <div class="veg-cover-block">
+                        <span class="veg-cover-type">Shrub</span>
+                        <span class="info-value" id="info-shrub">--</span>
+                    </div>
+
+                    <!-- Column 3: Herbaceous -->
+                    <div class="veg-cover-block">
+                        <span class="veg-cover-type">Herbaceous</span>
+                        <span class="info-value" id="info-herb">--</span>
+                    </div>
+
+                </div><!-- end .veg-cover-columns -->
+
+            </div><!-- end #row-veg-cover -->
             <!-- Row 6: Area in acres -->
             <div class="info-row" id="row-acres">
-                <span class="info-label">📐 Area</span>
+                <span class="info-label">Area</span>
                 <span class="info-value" id="info-acres">--</span>
             </div>
 
@@ -79,7 +111,7 @@
                  D3 draws an SVG chart inside #et-chart when a polygon is clicked.
                  The placeholder div is replaced by the chart at that point. -->
             <div class="info-row" id="row-et">
-                <span class="info-label">📈 ET Trend (2013–2024)</span>
+                <span class="info-label">ET Trend (2013-2024)</span>
                 <div id="et-chart">
                     <div class="et-placeholder">
                         Select a polygon to view its ET trend
@@ -97,11 +129,10 @@
     <script src="js/jquery.js"></script>
     <script src="js/leaflet.js"></script>
     <script src="js/d3.js"></script>
-    <script src="js/crossfilter.js"></script>
-    <script src="js/underscore.js"></script>
 
-    <!-- bcm.js loads last — it uses all the libraries above -->
+    <!-- bcm.js loads last - it uses all the libraries above -->
     <script src="js/bcm.js"></script>
 
 </body>
+
 </html>
