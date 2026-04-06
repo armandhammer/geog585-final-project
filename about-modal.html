@@ -1,0 +1,255 @@
+<!--
+  =============================================================
+  ABOUT MODAL - GEOG 585 Final Project
+  =============================================================
+  HOW TO USE THIS FILE:
+    1. Copy the "TRIGGER BUTTON" snippet and paste it wherever
+       you want the "About" button to appear on your page
+       (e.g. in your navbar or map toolbar).
+
+    2. Copy the "MODAL HTML" snippet and paste it anywhere
+       inside your <body> tag (just before </body> is fine).
+
+    3. Make sure your page already loads Bootstrap's CSS and JS.
+       If it doesn't, the CDN <link> and <script> tags below
+       show exactly what you need to add to your <head>.
+  =============================================================
+-->
+
+
+<!-- =============================================================
+     STEP 1 OF 3: Bootstrap CSS (paste in your <head> if needed)
+     This gives Bootstrap its styles -- buttons, modal box, etc.
+     ============================================================= -->
+<link
+  rel="stylesheet"
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+/>
+
+
+<!-- =============================================================
+     TRIGGER BUTTON
+     =============================================================
+     Paste this wherever you want the "About" button to appear.
+     The key attributes are:
+       data-toggle="modal"  -- tells Bootstrap to open a modal
+       data-target="#aboutModal" -- says WHICH modal to open
+                                    (matches the id below)
+     ============================================================= -->
+<button
+  type="button"
+  class="btn btn-info"
+  data-toggle="modal"
+  data-target="#aboutModal"
+>
+  About
+</button>
+
+
+<!-- =============================================================
+     MODAL HTML
+     =============================================================
+     Paste this anywhere inside your <body> tag.
+     The modal is hidden by default -- Bootstrap shows/hides it
+     when the trigger button above is clicked.
+     ============================================================= -->
+
+<!-- Outer wrapper: id must match data-target above -->
+<div class="modal fade" id="aboutModal" role="dialog">
+
+  <!-- Controls the width of the modal box -->
+  <div class="modal-dialog">
+
+    <!-- White box that contains everything the user sees -->
+    <div class="modal-content">
+
+
+      <!-- -------------------------------------------------------
+           MODAL HEADER
+           Contains the title and the "X" close button
+           ------------------------------------------------------- -->
+      <div class="modal-header">
+
+        <!-- "X" button in the top-right corner -->
+        <!-- data-dismiss="modal" tells Bootstrap to close the modal -->
+        <button type="button" class="close" data-dismiss="modal">
+          &times; <!-- &times; is the HTML code for the × character -->
+        </button>
+
+        <h4 class="modal-title">About This Project</h4>
+
+      </div><!-- end .modal-header -->
+
+
+      <!-- -------------------------------------------------------
+           MODAL BODY
+           This is where all the actual content goes.
+           ------------------------------------------------------- -->
+      <div class="modal-body">
+
+        <!-- ---------- ABOUT THE PROJECT ---------- -->
+        <h4>About the Project</h4>
+        <p>
+          <!-- Replace this paragraph with your own description! -->
+          This interactive web map application visualizes riparian
+          vegetation and land-cover change along the Middle Rio Grande
+          corridor in New Mexico. It is designed for researchers,
+          land managers, conservation planners, and students who want
+          to explore spatial patterns in riparian habitat over time
+          using an accessible, browser-based interface.
+          <!-- [TEAM: feel free to edit the sentence above] -->
+        </p>
+
+        <hr /> <!-- horizontal rule -- just a visual divider line -->
+
+        <!-- ---------- ABOUT THE TEAM ---------- -->
+        <h4>About the Team</h4>
+        <ul>
+
+          <!-- Each <li> is one team member -->
+          <!-- The <a> tag makes the name a clickable link -->
+          <!-- The href points to that person's GitHub Pages site -->
+
+          <li>
+            Team member:
+            <a href="https://armandhammer.github.io" target="_blank">
+              Ben Garland
+            </a>
+            <!-- target="_blank" opens the link in a new tab -->
+            (bengarland@unm.edu)
+          </li>
+
+          <li>
+            Team member:
+            <!-- Corrie's GitHub username is not yet known -->
+            <!-- Replace [corrie-github-username] when you have it -->
+            <a href="https://[corrie-github-username].github.io" target="_blank">
+              Corrie Gonzalez
+            </a>
+            (cdreas88@unm.edu)
+          </li>
+
+          <li>
+            Team member:
+            <a href="https://meirahw.github.io" target="_blank">
+              Meirah Williamson
+            </a>
+            (meirahw@unm.edu)
+          </li>
+
+          <li>
+            Project advisor:
+            <!-- Dr. Yang's official faculty/personal page -->
+            <a href="http://www.lipingyang.org" target="_blank">
+              Dr. Liping Yang
+            </a>
+            (course instructor of GEOG 485L/585L Interactive Web Mapping)
+          </li>
+
+        </ul><!-- end team list -->
+
+        <hr />
+
+        <!-- ---------- ACKNOWLEDGEMENTS ---------- -->
+        <h4>Acknowledgements</h4>
+        <p>This project was built using the following datasets, libraries, and examples:</p>
+        <ul>
+
+          <!-- Dataset sources -->
+          <li>
+            <!-- Replace with your actual dataset source -->
+            <a href="https://www.mrgcd.com/" target="_blank">
+              Middle Rio Grande Conservancy District (MRGCD)
+            </a>
+            – land cover and irrigation data
+          </li>
+
+          <!-- Library / example references -->
+          <!-- Using target="_blank" so links open in a new tab -->
+
+          <li>
+            <a href="https://leafletjs.com/examples.html" target="_blank">
+              Leaflet.js Official Tutorials
+            </a>
+            – interactive slippy map and layer controls
+          </li>
+
+          <li>
+            <a href="https://d3js.org/" target="_blank">
+              D3.js Official Documentation
+            </a>
+            – data-driven SVG charts and visualizations
+          </li>
+
+          <li>
+            <a href="https://observablehq.com/@d3/gallery" target="_blank">
+              D3.js Observable Gallery
+            </a>
+            – chart examples and D3 technique references
+          </li>
+
+          <li>
+            <a href="https://dc-js.github.io/dc.js/examples/" target="_blank">
+              DC.js Official Examples
+            </a>
+            – linked/brushable charts built on D3 and Crossfilter
+          </li>
+
+          <li>
+            <a href="https://crossfilter.github.io/crossfilter/" target="_blank">
+              Crossfilter.js Documentation
+            </a>
+            – fast multidimensional filtering of large datasets
+          </li>
+
+          <li>
+            <a href="https://getbootstrap.com/docs/3.4/components/" target="_blank">
+              Bootstrap 3 Components Documentation
+            </a>
+            – UI layout, modal, and navbar components
+          </li>
+
+          <li>
+            <a href="https://www.w3schools.com/bootstrap/bootstrap_modal.asp" target="_blank">
+              W3Schools – Bootstrap Modal Tutorial
+            </a>
+            – reference used for this About modal
+          </li>
+
+        </ul><!-- end acknowledgements list -->
+
+      </div><!-- end .modal-body -->
+
+
+      <!-- -------------------------------------------------------
+           MODAL FOOTER
+           Usually holds action buttons like "Close"
+           ------------------------------------------------------- -->
+      <div class="modal-footer">
+
+        <!-- Clicking this button closes the modal -->
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Close
+        </button>
+
+      </div><!-- end .modal-footer -->
+
+
+    </div><!-- end .modal-content -->
+  </div><!-- end .modal-dialog -->
+</div><!-- end #aboutModal -->
+
+
+<!-- =============================================================
+     STEP 2 OF 3: jQuery (paste in your <head> or before </body>)
+     Bootstrap's modal JavaScript requires jQuery to work.
+     If jQuery is already loaded on your page, skip this tag.
+     ============================================================= -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<!-- =============================================================
+     STEP 3 OF 3: Bootstrap JS (paste after jQuery, before </body>)
+     This is what makes the modal actually open and close.
+     If Bootstrap JS is already loaded on your page, skip this tag.
+     ============================================================= -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
