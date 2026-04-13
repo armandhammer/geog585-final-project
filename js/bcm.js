@@ -411,7 +411,71 @@ function updateETChart(polygonData) {
 }   
 
 /* ============================================================
-   PART 6: STARTUP
+   PART 6: CHOROPLETH SELECTOR
+   ============================================================ */
+function addChoroplethDropdown() {
+
+    var dropdownControl = L.control({ position: "topleft" });
+
+    dropdownControl.onAdd = function () {
+        var div = L.DomUtil.create("div", "choropleth-control");
+
+        var optionsHTML = "";
+        for (var fieldName in CHOROPLETH_LABELS) {
+            optionsHTML += '<option value="' + fieldName + '">'
+                         + CHOROPLETH_LABELS[fieldName] + '</option>';
+        }
+
+        div.innerHTML = '<label>Color map by:</label>'
+                      + '<select id="choropleth-select">' + optionsHTML + '</select>';
+
+        // Prevent dropdown clicks from also firing a map click event.
+        L.DomEvent.disableClickPropagation(div);
+        return div;
+    };
+
+    dropdownControl.addTo(map);
+
+    $(document).on("change", "#choropleth-select", function () {
+        currentChoroplethVariable = $(this).val();
+        updateAllPolygonColors();
+    });
+}
+
+// Returns a color interpolated between the variable's ramp based on the value (0–100).
+function getColorForValue(value, variableName) {
+    var colorScale = d3.scaleLinear()
+        .domain([0, 100])
+        .range(CHOROPLETH_COLORS[variableName]);
+    return colorScale(value);
+}
+
+// Returns the full Leaflet style object for a polygon feature.
+// Leaflet calls this automatically for each polygon when drawing the GeoJSON layer.
+function getPolygonStyle(feature) {
+    var value = feature.properties[currentChoroplethVariable] || 0;
+    return {
+        fillColor:   getColorForValue(value, currentChoroplethVariable),
+        fillOpacity: NORMAL_FILL_OPACITY,
+        color:       NORMAL_OUTLINE_COLOR,
+        weight:      NORMAL_OUTLINE_WIDTH,
+        opacity:     NORMAL_OUTLINE_OPACITY
+    };
+}
+
+// Recolors all polygons when the user changes the dropdown.
+// Skips the selected polygon so its highlight isn't overwritten.
+function updateAllPolygonColors() {
+    geojsonLayer.eachLayer(function (layer) {
+        if (layer !== currentlySelectedLayer) {
+            layer.setStyle(getPolygonStyle(layer.feature));
+        }
+    });
+}
+
+
+/* ============================================================
+   PART 7: STARTUP
    ============================================================ */
 
 
