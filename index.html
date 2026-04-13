@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<!--
+    index.html  -  Riparian Ecosystems Map  |  GEOG 585 Final Project
+
+    Left side  (60%) - Leaflet map
+    Right side (40%) - Info panel with polygon data
+
+    Connected files:
+      css/bcm.css  - layout and styles (will use -v1, -v2, etc until finished)
+      js/bcm.js    - all interactive behavior (will use -step1, -step2, etc until finished)
+-->
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Riparian Ecosystems Map - Middle Rio Grande</title>
+
+
+    <!-- CSS loads in <head> so elements are styled before appearing on screen.
+         bcm.css loads last so our styles can override library defaults. -->
+    <link rel="stylesheet" href="css/leaflet.css" />
+    <link rel="stylesheet" href="css/bootstrap.css" />
+    <link rel="stylesheet" href="css/bcm-v2.css" />
+
+    <!-- JavaScript loads at the bottom so all HTML elements exist before scripts run.
+         Libraries load before bcm.js since bcm.js depends on them. -->
+    <script src="js/jquery.js"></script>
+    <script src="js/leaflet.js"></script>
+    <script src="js/d3.v7.js"></script>
+
+    <!-- bcm.js loads last - it uses all the libraries above -->
+    <script src="js/bcm-step2-updated.js"></script>
+    <script src="js/mrw-charts-updated.js"></script>
+
+
+</head>
+
+<body>
+
+    <!-- #main-container: bcm.css uses flexbox here to place map and panel side by side -->
+    <div id="main-container">
+
+        <!-- LEFT: Map (60% width)
+             #map-container needs position:relative so Leaflet controls position correctly.
+             Leaflet draws the interactive map inside #map. -->
+        <div id="map-container">
+            <div id="map"></div>
+        </div>
+
+        <!-- RIGHT: Info panel (40% width)
+             bcm.js updates the .info-value spans by id when a polygon is clicked. -->
+        <div id="info-panel">
+
+            <!-- Row 1: Header -->
+            <div class="info-row" id="row-header">
+                <span class="header-title">Riparian Ecosystems Info Panel</span>
+                <span class="header-subtitle">Middle Rio Grande</span>
+            </div>
+
+            <!-- Row 2: Vegetation community name -->
+            <div class="info-row" id="row-name">
+                <span class="info-label">Vegetation Type</span>
+                <span class="info-value" id="info-name">
+                    &larr; Click a polygon on the map to see details
+                </span>
+            </div>
+
+            <!-- Row 3: Tree cover -->
+            <div class="info-row" id="row-tree">
+                <span class="info-label">Tree Cover</span>
+                <span class="info-value" id="info-tree">--</span>
+            </div>
+
+            <!-- Row 4: Shrub cover -->
+            <div class="info-row" id="row-shrub">
+                <span class="info-label">Shrub Cover</span>
+                <span class="info-value" id="info-shrub">--</span>
+            </div>
+
+            <!-- Row 5: Herbaceous cover -->
+            <div class="info-row" id="row-herb">
+                <span class="info-label">Herbaceous Cover</span>
+                <span class="info-value" id="info-herb">--</span>
+            </div>
+
+            <!-- Row 6: Area in acres -->
+            <div class="info-row" id="row-acres">
+                <span class="info-label">Area</span>
+                <span class="info-value" id="info-acres">--</span>
+            </div>
+
+            <!-- Row 7: ET trend chart
+                 D3 draws an SVG chart inside #et-chart when a polygon is clicked.
+                 The placeholder div is replaced by the chart at that point. -->
+            <div class="info-row" id="row-et">
+                <span class="info-label">ET Trend (2013-2024)</span>
+                <div id="et-chart">
+                    <div class="et-placeholder">
+                        Select a polygon to view its ET trend
+                    </div>
+                    <div class="et-tooltip"> </div>
+
+
+                </div>
+            </div>
+
+
+        </div><!-- end #info-panel -->
+
+    </div><!-- end #main-container -->
+
+
+
+</body>
+
+</html>
