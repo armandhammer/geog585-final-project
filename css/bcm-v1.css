@@ -1,0 +1,248 @@
+/* ============================================================
+   bcm-v1.css  -  Riparian Ecosystems Map | GEOG 585 Final Project
+
+   ORGANIZATION:
+   Part 1 - Global reset
+   Part 2 - Page layout
+   Part 3 - Map area (left side)
+   Part 4 - Info panel (right side)
+   Part 5 - Info panel rows
+   Part 6 - Responsive layout
+   ============================================================ */
+
+
+/* PART 1: GLOBAL RESET
+   Remove browser default margins so our layout fills the window cleanly.
+*/
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+}
+
+
+/* PART 2: PAGE LAYOUT
+   Flexbox places the map and info panel side by side.
+   100vw/100vh fills the entire browser window.
+*/
+
+#main-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+
+/* PART 3: MAP AREA (left side, 40% width)
+*/
+
+/*
+   position: relative is required by Leaflet so that its controls
+   (zoom buttons, layer switcher, choropleth dropdown) position
+   themselves relative to the map container, not the whole page.
+*/
+#map-container {
+    width: 60%;
+    height: 100vh;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/*
+   Leaflet requires an explicit height on the map div or it collapses to zero.
+*/
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+/*
+   .leaflet-interactive is the class Leaflet adds to clickable SVG polygon elements.
+   Setting cursor: pointer gives users the visual cue that polygons are clickable.
+*/
+.leaflet-interactive {
+    cursor: pointer;
+}
+
+
+/* PART 4: INFO PANEL (right side, 40% width)
+*/
+
+#info-panel {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    /* stack rows vertically */
+    overflow-y: auto;
+}
+
+
+/* PART 5: INFO PANEL ROWS
+*/
+
+/*
+   Base style for all rows.
+   flex: 1 means each row gets an equal share of the panel height.
+   Rows with a different flex value (e.g. flex: 3 on #row-et) get
+   proportionally more space.
+*/
+.info-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 14px 24px;
+    flex: 1;
+    min-height: 60px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.info-label {
+    font-weight: bold;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.75;
+    margin-bottom: 4px;
+}
+
+.info-value {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Row 1: Header - deep forest green, fixed height */
+#row-header {
+    background-color: #1b4332;
+    color: white;
+    flex: 0 0 80px;
+    /* fixed at 80px, doesn't grow or shrink */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 12px 24px;
+}
+
+.header-title {
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.03em;
+}
+
+.header-subtitle {
+    font-size: 13px;
+    opacity: 0.75;
+    margin-top: 3px;
+}
+
+/* Row 2: Vegetation name - medium green */
+#row-name {
+    background-color: #40916c;
+    color: white;
+    min-height: 70px;
+}
+
+#row-name .info-value {
+    font-size: 16px;
+    font-style: italic;
+}
+
+/* Row 3: Tree cover - lighter green */
+#row-tree {
+    background-color: #74c69d;
+    color: #1b4332;
+}
+
+/* Row 4: Shrub cover */
+#row-shrub {
+    background-color: #b7e4c7;
+    color: #2d4a1e;
+}
+
+/* Row 5: Herbaceous cover - pale yellow-green */
+#row-herb {
+    background-color: #d8f3dc;
+    color: #2d4a1e;
+}
+
+/* Row 6: Area - soft blue (visually separates "size" from "cover" rows) */
+#row-acres {
+    background-color: #a8c5da;
+    color: #1a3a4a;
+}
+
+/* Row 7: ET chart - light grey, 3x taller than other rows for the chart */
+#row-et {
+    background-color: #f4f4f4;
+    color: #333;
+    flex: 3;
+    min-height: 220px;
+    min-width: 100%;
+}
+
+#row-et .info-label {
+    color: #555;
+}
+
+
+/* PART 7: ET CHART
+    need to fix min-width... hangs over the info-panel, 
+    but any smaller and the year labels are too close/overlap 
+*/
+#et-chart {
+    min-width: 450px;
+    flex: 1;
+    margin-top: 8px;
+}
+
+/* Placeholder shown before a polygon is selected or when data is unavailable */
+.et-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 160px;
+    border: 2px dashed #bbb;
+    border-radius: 8px;
+    color: #999;
+    font-style: italic;
+    font-size: 14px;
+    text-align: center;
+    background-color: white;
+}
+/* tooltip */
+.et-tooltip {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    font-size: 12px;
+    width: auto;
+    border-radius: 4px;
+    pointer-events: none;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* PART 6: RESPONSIVE LAYOUT
+   On narrow screens (phones), stack the map above the info panel
+   instead of placing them side by side.
+*/
+
+@media (max-width: 700px) {
+    #main-container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    #map-container {
+        width: 100%;
+        height: 50vh;
+    }
+
+    #info-panel {
+        width: 100%;
+    }
+}
