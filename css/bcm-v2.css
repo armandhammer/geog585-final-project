@@ -331,3 +331,10 @@ Part 8 : COLLAPSIBLE LEGEND
     display: block;
     max-height: 420px;
 }
+
+#about-map-button {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+    z-index: 1000;
+}
