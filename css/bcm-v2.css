@@ -358,6 +358,8 @@ Part 8 : COLLAPSIBLE LEGEND
     position: absolute;
     top: 0;
     left: 40px;   /* adjust if needed (width of zoom control) */
+    clear: none !important;
+}
 }
 
 /* Style button to match Leaflet controls */
