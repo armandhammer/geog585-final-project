@@ -29,6 +29,7 @@
     <script src="js/jquery.js"></script>
     <script src="js/leaflet.js"></script>
     <script src="js/d3.v7.js"></script>
+    <script src="js/bootstrap.js"></script>
 
     <!-- bcm.js loads last - it uses all the libraries above -->
     <script src="js/bcm-step3.js"></script>
@@ -47,6 +48,7 @@
              Leaflet draws the interactive map inside #map. -->
         <div id="map-container">
             <div id="map"></div>
+            <button type="button" id="about-map-button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#aboutModal">About</button>
         </div>
 
         <!-- RIGHT: Info panel (40% width)
@@ -112,7 +114,62 @@
     </div><!-- end #main-container -->
 
 
+<div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
 
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="aboutModalLabel">About This Project</h4>
+            </div>
+
+            <div class="modal-body">
+                <h4>About the project</h4>
+                <p>
+                    This web map app helps users explore riparian ecosystem patterns in the Middle Rio Grande study area.
+                    Users can click polygons to view vegetation cover, area, and ET trends, and can switch the map display
+                    between vegetation community, tree cover, shrub cover, and herbaceous cover.
+                </p>
+
+                <h4>About the team</h4>
+                <p>
+                    Team member:
+                    <a href="https://your-github-page-a.github.io/" target="_blank">Developer A Name</a>
+                    (developerA@email.com)
+                </p>
+                <p>
+                    Team member:
+                    <a href="https://your-github-page-b.github.io/" target="_blank">Developer B Name</a>
+                    (developerB@email.com)
+                </p>
+                <p>
+                    Project advisor:
+                    <a href="https://www.lipingyang.org" target="_blank">Dr. Liping Yang</a>
+                    (course instructor of GEOG 485L/585L Interactive Web Mapping)
+                </p>
+
+                <h4>Acknowledgements</h4>
+                <p>
+                    Dataset source:
+                    <a href="https://rgis.unm.edu/" target="_blank">RGIS at UNM</a>
+                </p>
+                <p>
+                    Examples and libraries:
+                    <a href="https://leafletjs.com/" target="_blank">Leaflet</a>,
+                    <a href="https://getbootstrap.com/docs/3.4/javascript/#modals" target="_blank">Bootstrap Modal Plugin</a>,
+                    <a href="https://d3js.org/" target="_blank">D3.js</a>
+                </p>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+
+        </div>
+    </div>
+</div>
 </body>
 
 </html>
