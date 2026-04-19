@@ -66,6 +66,10 @@ var vegetationColorMap = {};
 
 /* MAP SETUP */
 
+/* Reference: Leaflet Quick Start Guide
+   https://leafletjs.com/examples/quick-start/
+   Used here for the basic Leaflet map setup pattern. */
+
 function createLeafletMap() {
     return L.map("map").setView([MAP_START_LAT, MAP_START_LON], MAP_START_ZOOM);
 }
@@ -103,6 +107,10 @@ function createSimpleBasemap() {
     );
 }
 
+/* Reference: Leaflet "Layer Groups and Layers Control"
+   https://leafletjs.com/examples/layers-control/
+   Used here for the base-layer / overlay control pattern with L.control.layers(...). */
+
 function addLayerControl() {
     if (layerControl) {
         layerControl.remove();
@@ -119,6 +127,11 @@ function addLayerControl() {
         }
     ).addTo(map);
 }
+
+
+/* Reference: Leaflet "Extending Leaflet, New Handlers and Controls"
+   https://leafletjs.com/examples/extending/extending-3-controls.html
+   Used here for the custom control pattern with onAdd(). */
 
 function addZoomToDataControl() {
     if (zoomToDataControl) {
@@ -177,8 +190,13 @@ function getColorPalette() {
     ];
 }
 
+/* Reference: Leaflet "Interactive Choropleth Map"
+   https://leafletjs.com/examples/choropleth/
+   Used here as a reference for GeoJSON styling, choropleth coloring, and legend ideas. */
+
 // This worked before, but this version simplifies how unique categories map to colors.
 // Used ChatGPT to cleanly generate a lookup table.
+
 function buildVegetationColorMap(geojsonData) {
     var uniqueNames = [];
 
@@ -335,6 +353,10 @@ function addGeoJSONToMap(geojsonData) {
     addLayerControl();
     addVegetationLegend();
 }
+
+/* Reference: jQuery getJSON() Method
+   https://www.w3schools.com/jquery/ajax_getjson.asp
+   Used here for the basic pattern to load GeoJSON with $.getJSON(...). */
 
 function loadGeoJSONFile() {
     $.getJSON(GEOJSON_PATH, function (data) {
