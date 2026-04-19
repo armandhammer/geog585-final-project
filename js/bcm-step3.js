@@ -1,4 +1,4 @@
-/* bcm-step2-updated.js
+/* bcm-step3.js
 
    Features:
    - Vegetation community map colors
@@ -54,6 +54,7 @@ var layerControl;
 var satelliteLayers;
 var simpleLayer;
 var vegetationLegend;
+var isLegendExpanded = false;
 
 var vegetationColorMap = {};
 
@@ -359,15 +360,17 @@ function addVegetationLegend() {
     vegetationLegend = L.control({ position: "topleft" });
 
     vegetationLegend.onAdd = function () {
-        var div = L.DomUtil.create("div", "legend legend-collapsed");
+        var legendClass = isLegendExpanded ? "legend legend-expanded" : "legend legend-collapsed";
+        var buttonText = isLegendExpanded ? "Hide" : "Show";
+
+        var div = L.DomUtil.create("div", legendClass);
         var html = '';
 
         html += '<div class="legend-header">';
         html += '  <span class="legend-title">Map Display</span>';
-        html += '  <button type="button" class="legend-toggle-btn" id="legend-toggle-btn">Show</button>';
+        html += '  <button type="button" class="legend-toggle-btn" id="legend-toggle-btn">' + buttonText + '</button>';
         html += '</div>';
 
-        // Simple dropdown inside the legend box
         html += '<div style="margin-top:8px;">';
         html += '  <label for="legend-mode-select" style="display:block; font-weight:bold; margin-bottom:6px;">Display Variable</label>';
         html += '  <select id="legend-mode-select" style="width:100%; padding:6px 8px; font-size:13px;">';
@@ -384,32 +387,21 @@ function addVegetationLegend() {
 
         div.innerHTML = html;
 
-        L.DomEvent.disableClickPropagation(div);
-        L.DomEvent.disableScrollPropagation(div);
+        var toggleBtn = div.querySelector("#legend-toggle-btn");
+        var modeSelect = div.querySelector("#legend-mode-select");
 
-        return div;
-    };
-
-    vegetationLegend.addTo(map);
-
-    // Add events after legend HTML is on the page
-    setTimeout(function () {
-        var toggleBtn = document.getElementById("legend-toggle-btn");
-        var legendBox = document.querySelector(".legend");
-        var modeSelect = document.getElementById("legend-mode-select");
-
-        if (toggleBtn && legendBox) {
+        if (toggleBtn) {
             toggleBtn.addEventListener("click", function () {
-                var isCollapsed = legendBox.classList.contains("legend-collapsed");
-
-                if (isCollapsed) {
-                    legendBox.classList.remove("legend-collapsed");
-                    legendBox.classList.add("legend-expanded");
-                    toggleBtn.textContent = "Hide";
-                } else {
-                    legendBox.classList.remove("legend-expanded");
-                    legendBox.classList.add("legend-collapsed");
+                if (isLegendExpanded) {
+                    isLegendExpanded = false;
+                    div.classList.remove("legend-expanded");
+                    div.classList.add("legend-collapsed");
                     toggleBtn.textContent = "Show";
+                } else {
+                    isLegendExpanded = true;
+                    div.classList.remove("legend-collapsed");
+                    div.classList.add("legend-expanded");
+                    toggleBtn.textContent = "Hide";
                 }
             });
         }
@@ -420,7 +412,14 @@ function addVegetationLegend() {
                 updateFillLayerColors();
             });
         }
-    }, 0);
+
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+
+        return div;
+    };
+
+    vegetationLegend.addTo(map);
 }
 
 // Recolor the fill layer and rebuild the legend
@@ -433,7 +432,11 @@ function updateFillLayerColors() {
         layer.setStyle(getFillLayerStyle(layer.feature));
     });
 
-    addVegetationLegend();
+    var legendBody = document.getElementById("legend-body");
+
+    if (legendBody) {
+        legendBody.innerHTML = buildLegendItemsHtml();
+    }
 }
 
 
