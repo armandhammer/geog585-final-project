@@ -8,6 +8,7 @@
    - Polygon click updates info panel
    - Polygon click updates ET chart
    - One legend box with a simple dropdown
+
 */
 
 
