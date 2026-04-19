@@ -435,7 +435,7 @@ function addVegetationLegend() {
 
     vegetationLegend.onAdd = function () {
         var legendClass = isLegendExpanded ? "legend legend-expanded" : "legend legend-collapsed";
-        var buttonText = isLegendExpanded ? "Hide" : "Show";
+        var buttonText = isLegendExpanded ? "Hide Legend" : "Show Legend";
 
         var div = L.DomUtil.create("div", legendClass);
         var html = '';
@@ -472,12 +472,12 @@ function addVegetationLegend() {
                     isLegendExpanded = false;
                     div.classList.remove("legend-expanded");
                     div.classList.add("legend-collapsed");
-                    toggleBtn.textContent = "Show";
+                    toggleBtn.textContent = "Show Legend";
                 } else {
                     isLegendExpanded = true;
                     div.classList.remove("legend-collapsed");
                     div.classList.add("legend-expanded");
-                    toggleBtn.textContent = "Hide";
+                    toggleBtn.textContent = "Hide Legend";
                 }
             });
         }
