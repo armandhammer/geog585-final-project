@@ -68,7 +68,7 @@ var vegetationColorMap = {};
 
 /* Reference: Leaflet Quick Start Guide
    https://leafletjs.com/examples/quick-start/
-   Used here for the basic Leaflet map setup pattern. */
+   Reference for basic Leaflet map setup pattern. */
 
 function createLeafletMap() {
     return L.map("map").setView([MAP_START_LAT, MAP_START_LON], MAP_START_ZOOM);
@@ -109,7 +109,7 @@ function createSimpleBasemap() {
 
 /* Reference: Leaflet "Layer Groups and Layers Control"
    https://leafletjs.com/examples/layers-control/
-   Used here for the base-layer / overlay control pattern with L.control.layers(...). */
+   Used for the base layer / overlay control pattern with L.control.layers. */
 
 function addLayerControl() {
     if (layerControl) {
@@ -131,7 +131,7 @@ function addLayerControl() {
 
 /* Reference: Leaflet "Extending Leaflet, New Handlers and Controls"
    https://leafletjs.com/examples/extending/extending-3-controls.html
-   Used here for the custom control pattern with onAdd(). */
+   Used idea for the custom control pattern with onAdd(). */
 
 function addZoomToDataControl() {
     if (zoomToDataControl) {
@@ -192,10 +192,10 @@ function getColorPalette() {
 
 /* Reference: Leaflet "Interactive Choropleth Map"
    https://leafletjs.com/examples/choropleth/
-   Used here as a reference for GeoJSON styling, choropleth coloring, and legend ideas. */
+   Used for a reference for GeoJSON styling, choropleth coloring, and legend ideas. */
 
 // This worked before, but this version simplifies how unique categories map to colors.
-// Used ChatGPT to cleanly generate a lookup table.
+// Used ChatGPT to simplify category-to-color mapping into a lookup table.
 
 function buildVegetationColorMap(geojsonData) {
     var uniqueNames = [];
@@ -271,7 +271,8 @@ function getHerbCoverColor(value) {
 }
 
 // This logic originally worked but was spread out in multiple places.
-// Used ChatGPT to combine all display-mode color decisions into one function.
+// Used ChatGPT to consolidate display mode color logic into a single function.
+
 function getCurrentFillColor(feature) {
     if (currentDisplayMode === "vegetation-community") {
         var vegetationName = feature.properties[POLYGON_NAME_FIELD] || "Unknown";
@@ -420,6 +421,10 @@ function buildLegendItemsHtml() {
 
     return html;
 }
+
+/* Reference: Leaflet Control / Custom Control pattern
+   https://leafletjs.com/examples/extending/extending-3-controls.html
+   Reference for building a custom legend control with dynamic content. */
 
 function addVegetationLegend() {
     if (vegetationLegend) {
@@ -590,6 +595,10 @@ function updateInfoPanel(properties) {
 
 
 /* ET CHART */
+
+/* Reference: D3 Getting Started (Line Chart Pattern)
+   https://d3js.org/getting-started
+   Reference for basic line chart structure (scales, axes, line generator). */
 
 function updateETChart(polygonData) {
     if (
