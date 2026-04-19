@@ -55,6 +55,8 @@ var satelliteLayers;
 var simpleLayer;
 var vegetationLegend;
 
+var zoomToDataControl;
+
 // Legend was resetting open/closed state when switching display variables.
 // Used ChatGPT to store the state instead of relying on legend rebuilds.
 var isLegendExpanded = false;
@@ -118,6 +120,37 @@ function addLayerControl() {
     ).addTo(map);
 }
 
+function addZoomToDataControl() {
+    if (zoomToDataControl) {
+        zoomToDataControl.remove();
+    }
+
+    zoomToDataControl = L.control({ position: "topleft" });
+
+    zoomToDataControl.onAdd = function () {
+        var div = L.DomUtil.create("div", "leaflet-bar leaflet-control");
+        div.innerHTML = '<button type="button" class="zoom-data-btn">Zoom to Data Extent</button>';
+
+        var button = div.querySelector(".zoom-data-btn");
+
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+
+        if (button) {
+            button.addEventListener("click", function () {
+                if (vegetationFillLayer) {
+                    map.fitBounds(vegetationFillLayer.getBounds(), {
+                        padding: [20, 20]
+                    });
+                }
+            });
+        }
+
+        return div;
+    };
+
+    zoomToDataControl.addTo(map);
+}
 
 /* COLOR HELPERS */
 
@@ -284,7 +317,7 @@ function getOutlineLayerStyle() {
 // Used ChatGPT to make display switching cleaner without reloading data.
 function addGeoJSONToMap(geojsonData) {
     buildVegetationColorMap(geojsonData);
-
+   
     vegetationFillLayer = L.geoJSON(geojsonData, {
         style: getFillLayerStyle,
         interactive: false
@@ -300,6 +333,7 @@ function addGeoJSONToMap(geojsonData) {
 
     addLayerControl();
     addVegetationLegend();
+    addZoomToDataControl();
 }
 
 function loadGeoJSONFile() {
