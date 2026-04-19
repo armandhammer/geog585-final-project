@@ -343,3 +343,34 @@ Part 8 : COLLAPSIBLE LEGEND
 #about-map-button:hover {
     background-color: #f3f3f3;
 }
+
+
+
+/* ZOOM TO EXTENT BUTTON */
+
+/* Position container relative so we can offset inside it */
+.leaflet-top.leaflet-left {
+    position: relative;
+}
+
+/* Move button to the right of zoom controls */
+.zoom-data-control {
+    position: absolute;
+    top: 0;
+    left: 40px;   /* adjust if needed (width of zoom control) */
+}
+
+/* Style button to match Leaflet controls */
+.zoom-data-btn {
+    height: 30px;
+    padding: 0 10px;
+    border: 1px solid #ccc;
+    background: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.zoom-data-btn:hover {
+    background: #f4f4f4;
+}
