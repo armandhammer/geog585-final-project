@@ -331,9 +331,9 @@ function addGeoJSONToMap(geojsonData) {
     vegetationFillLayer.addTo(map);
     vegetationOutlineLayer.addTo(map);
 
+    addZoomToDataControl();
     addLayerControl();
     addVegetationLegend();
-    addZoomToDataControl();
 }
 
 function loadGeoJSONFile() {
