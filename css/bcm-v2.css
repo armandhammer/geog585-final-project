@@ -1,20 +1,11 @@
 /* ============================================================
    bcm-v1.css  -  Riparian Ecosystems Map | GEOG 585 Final Project
-
-   ORGANIZATION:
-   Part 1 - Global reset
-   Part 2 - Page layout
-   Part 3 - Map area (left side)
-   Part 4 - Info panel (right side)
-   Part 5 - Info panel rows
-   Part 6 - Responsive layout
    ============================================================ */
 
 
-/* PART 1: GLOBAL RESET
-   Remove browser default margins so our layout fills the window cleanly.
-*/
+/* PART 1: GLOBAL RESET */
 
+/* Remove default margins and set base font styling */
 html,
 body {
     height: 100%;
@@ -25,11 +16,9 @@ body {
 }
 
 
-/* PART 2: PAGE LAYOUT
-   Flexbox places the map and info panel side by side.
-   100vw/100vh fills the entire browser window.
-*/
+/* PART 2: PAGE LAYOUT */
 
+/* Main flex container for map and info panel */
 #main-container {
     display: flex;
     width: 100vw;
@@ -37,14 +26,9 @@ body {
 }
 
 
-/* PART 3: MAP AREA (left side, 40% width)
-*/
+/* PART 3: MAP AREA */
 
-/*
-   position: relative is required by Leaflet so that its controls
-   (zoom buttons, layer switcher, choropleth dropdown) position
-   themselves relative to the map container, not the whole page.
-*/
+/* Container that holds the Leaflet map */
 #map-container {
     width: 60%;
     height: 100vh;
@@ -52,44 +36,32 @@ body {
     flex-shrink: 0;
 }
 
-/*
-   Leaflet requires an explicit height on the map div or it collapses to zero.
-*/
+/* Actual Leaflet map element (must have explicit size) */
 #map {
     width: 100%;
     height: 100%;
 }
 
-/*
-   .leaflet-interactive is the class Leaflet adds to clickable SVG polygon elements.
-   Setting cursor: pointer gives users the visual cue that polygons are clickable.
-*/
+/* Change cursor when hovering over clickable polygons */
 .leaflet-interactive {
     cursor: pointer;
 }
 
 
-/* PART 4: INFO PANEL (right side, 40% width)
-*/
+/* PART 4: INFO PANEL */
 
+/* Right-side panel that displays selected polygon info */
 #info-panel {
     width: 40%;
     display: flex;
     flex-direction: column;
-    /* stack rows vertically */
     overflow-y: auto;
 }
 
 
-/* PART 5: INFO PANEL ROWS
-*/
+/* PART 5: INFO PANEL ROWS */
 
-/*
-   Base style for all rows.
-   flex: 1 means each row gets an equal share of the panel height.
-   Rows with a different flex value (e.g. flex: 3 on #row-et) get
-   proportionally more space.
-*/
+/* Base style shared by all info rows */
 .info-row {
     display: flex;
     flex-direction: column;
@@ -100,6 +72,7 @@ body {
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
+/* Label text styling for each row */
 .info-label {
     font-weight: bold;
     font-size: 13px;
@@ -109,17 +82,17 @@ body {
     margin-bottom: 4px;
 }
 
+/* Main value text styling */
 .info-value {
     font-size: 18px;
     font-weight: 600;
 }
 
-/* Row 1: Header - deep forest green, fixed height */
+/* Header row (title area at top of panel) */
 #row-header {
     background-color: #1b4332;
     color: white;
     flex: 0 0 80px;
-    /* fixed at 80px, doesn't grow or shrink */
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -127,55 +100,58 @@ body {
     padding: 12px 24px;
 }
 
+/* Title text inside header */
 .header-title {
     font-size: 18px;
     font-weight: bold;
     letter-spacing: 0.03em;
 }
 
+/* Subtitle text inside header */
 .header-subtitle {
     font-size: 13px;
     opacity: 0.75;
     margin-top: 3px;
 }
 
-/* Row 2: Vegetation name - medium green */
+/* Vegetation name row */
 #row-name {
     background-color: #40916c;
     color: white;
     min-height: 70px;
 }
 
+/* Styling tweak for vegetation name text */
 #row-name .info-value {
     font-size: 16px;
     font-style: italic;
 }
 
-/* Row 3: Tree cover - lighter green */
+/* Tree cover row */
 #row-tree {
     background-color: #74c69d;
     color: #1b4332;
 }
 
-/* Row 4: Shrub cover */
+/* Shrub cover row */
 #row-shrub {
     background-color: #b7e4c7;
     color: #2d4a1e;
 }
 
-/* Row 5: Herbaceous cover - pale yellow-green */
+/* Herbaceous cover row */
 #row-herb {
     background-color: #d8f3dc;
     color: #2d4a1e;
 }
 
-/* Row 6: Area - soft blue (visually separates "size" from "cover" rows) */
+/* Area (acres) row */
 #row-acres {
     background-color: #a8c5da;
     color: #1a3a4a;
 }
 
-/* Row 7: ET chart - light grey, 3x taller than other rows for the chart */
+/* ET chart row (larger to fit chart) */
 #row-et {
     background-color: #f4f4f4;
     color: #333;
@@ -184,22 +160,22 @@ body {
     min-width: 100%;
 }
 
+/* Slightly muted label styling in ET section */
 #row-et .info-label {
     color: #555;
 }
 
 
-/* PART 7: ET CHART
-    need to fix min-width... hangs over the info-panel, 
-    but any smaller and the year labels are too close/overlap 
-*/
+/* PART 6: ET CHART */
+
+/* Container for D3 chart */
 #et-chart {
     min-width: 450px;
     flex: 1;
     margin-top: 8px;
 }
 
-/* Placeholder shown before a polygon is selected or when data is unavailable */
+/* Placeholder shown when no data is selected */
 .et-placeholder {
     display: flex;
     align-items: center;
@@ -213,7 +189,8 @@ body {
     text-align: center;
     background-color: white;
 }
-/* tooltip */
+
+/* Tooltip styling for chart hover values */
 .et-tooltip {
     position: absolute;
     background: white;
@@ -226,11 +203,10 @@ body {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* PART 6: RESPONSIVE LAYOUT
-   On narrow screens (phones), stack the map above the info panel
-   instead of placing them side by side.
-*/
 
+/* PART 7: RESPONSIVE LAYOUT */
+
+/* Stack map above panel on small screens */
 @media (max-width: 700px) {
     #main-container {
         flex-direction: column;
@@ -247,10 +223,10 @@ body {
     }
 }
 
-/* =========================================================
-Part 8 : COLLAPSIBLE LEGEND
-==========================================================*/
 
+/* PART 8: COLLAPSIBLE LEGEND */
+
+/* Main legend container box */
 .legend {
     background: rgba(255, 255, 255, 0.96);
     border-radius: 8px;
@@ -262,12 +238,14 @@ Part 8 : COLLAPSIBLE LEGEND
     clear: both;
 }
 
+/* Fixed width for all legend states */
 .legend,
 .legend-collapsed,
 .legend-expanded {
     width: 260px;
 }
 
+/* Header row inside legend (title + toggle button) */
 .legend-header {
     display: flex;
     align-items: center;
@@ -275,12 +253,14 @@ Part 8 : COLLAPSIBLE LEGEND
     gap: 10px;
 }
 
+/* Legend title text */
 .legend-title {
     font-weight: bold;
     color: #1b4332;
     font-size: 14px;
 }
 
+/* Show/Hide toggle button */
 .legend-toggle-btn {
     border: 1px solid #999;
     background: white;
@@ -290,22 +270,26 @@ Part 8 : COLLAPSIBLE LEGEND
     cursor: pointer;
 }
 
+/* Hover effect for toggle button */
 .legend-toggle-btn:hover {
     background: #f3f3f3;
 }
 
+/* Container for legend items */
 .legend-body {
     margin-top: 8px;
     overflow-y: auto;
     overflow-x: hidden;
 }
 
+/* Individual legend item row */
 .legend-item {
     display: flex;
     align-items: flex-start;
     margin-bottom: 6px;
 }
 
+/* Legend colors rectangles */
 .legend-color {
     width: 14px;
     height: 14px;
@@ -315,20 +299,27 @@ Part 8 : COLLAPSIBLE LEGEND
     flex-shrink: 0;
 }
 
+/* Label text next to swatch */
 .legend-label {
     white-space: normal;
     word-break: break-word;
 }
 
+/* Hide legend items when collapsed */
 .legend-collapsed .legend-body {
     display: none;
 }
 
+/* Show legend items with scroll when expanded */
 .legend-expanded .legend-body {
     display: block;
     max-height: 420px;
 }
 
+
+/* ABOUT BUTTON */
+
+/* Button positioned in bottom-right of map */
 #about-map-button {
     position: absolute;
     right: 15px;
@@ -341,14 +332,15 @@ Part 8 : COLLAPSIBLE LEGEND
     padding: 6px 12px;
 }
 
+/* Hover effect for about button */
 #about-map-button:hover {
     background-color: #f3f3f3;
 }
 
 
-
 /* ZOOM TO EXTENT BUTTON */
 
+/* Button used to zoom map to full data extent */
 .zoom-data-btn {
     display: block;
     height: 30px;
@@ -360,6 +352,7 @@ Part 8 : COLLAPSIBLE LEGEND
     white-space: nowrap;
 }
 
+/* Hover state for zoom button */
 .zoom-data-btn:hover {
     background: #f4f4f4;
 }
