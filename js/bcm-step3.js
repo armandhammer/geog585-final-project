@@ -21,7 +21,7 @@ var GEOJSON_ID_FIELD = "OBJECTID";
 
 var MAP_START_LAT = 35.16514;
 var MAP_START_LON = -106.66186;
-var MAP_START_ZOOM = 14;
+var MAP_START_ZOOM = 16;
 
 // Outline-only clickable layer
 var POLYGON_FILL_COLOR = "transparent";
@@ -54,6 +54,9 @@ var layerControl;
 var satelliteLayers;
 var simpleLayer;
 var vegetationLegend;
+
+// Legend was resetting open/closed state when switching display variables.
+// Used ChatGPT to store the state instead of relying on legend rebuilds.
 var isLegendExpanded = false;
 
 var vegetationColorMap = {};
@@ -141,6 +144,8 @@ function getColorPalette() {
     ];
 }
 
+// This worked before, but this version simplifies how unique categories map to colors.
+// Used ChatGPT to cleanly generate a lookup table.
 function buildVegetationColorMap(geojsonData) {
     var uniqueNames = [];
 
@@ -156,6 +161,7 @@ function buildVegetationColorMap(geojsonData) {
 
     var palette = getColorPalette();
 
+    // Keeps color assignment simple even if categories exceed palette size.
     uniqueNames.forEach(function (name, index) {
         vegetationColorMap[name] = palette[index % palette.length];
     });
@@ -213,7 +219,8 @@ function getHerbCoverColor(value) {
     }
 }
 
-// Decide fill color based on current display mode
+// This logic originally worked but was spread out in multiple places.
+// Used ChatGPT to combine all display-mode color decisions into one function.
 function getCurrentFillColor(feature) {
     if (currentDisplayMode === "vegetation-community") {
         var vegetationName = feature.properties[POLYGON_NAME_FIELD] || "Unknown";
@@ -222,10 +229,14 @@ function getCurrentFillColor(feature) {
 
     var value = feature.properties[currentDisplayMode];
 
+    // Some features had missing values causing inconsistent styling.
+    // Used ChatGPT to standardize fallback handling.
     if (value === null || value === undefined || isNaN(value)) {
         value = 0;
     }
 
+    // Values were occasionally treated as strings.
+    // Used ChatGPT to ensure numeric conversion.
     value = Number(value);
 
     if (currentDisplayMode === "Tot_Tree_Cov") {
@@ -269,6 +280,8 @@ function getOutlineLayerStyle() {
 
 /* GEOJSON */
 
+// Data loading already worked, but this keeps styling separate from loading.
+// Used ChatGPT to make display switching cleaner without reloading data.
 function addGeoJSONToMap(geojsonData) {
     buildVegetationColorMap(geojsonData);
 
@@ -391,6 +404,8 @@ function addVegetationLegend() {
         var modeSelect = div.querySelector("#legend-mode-select");
 
         if (toggleBtn) {
+            // Toggle worked before, but was tied to less precise element selection.
+            // Used ChatGPT to bind directly to this legend instance.
             toggleBtn.addEventListener("click", function () {
                 if (isLegendExpanded) {
                     isLegendExpanded = false;
@@ -422,12 +437,14 @@ function addVegetationLegend() {
     vegetationLegend.addTo(map);
 }
 
-// Recolor the fill layer and rebuild the legend
+// Originally rebuilt the entire legend on each dropdown change.
+// Used ChatGPT to update only the legend contents instead.
 function updateFillLayerColors() {
     if (!vegetationFillLayer) {
         return;
     }
 
+    // Recolor existing features instead of reloading the GeoJSON.
     vegetationFillLayer.eachLayer(function (layer) {
         layer.setStyle(getFillLayerStyle(layer.feature));
     });
@@ -442,6 +459,8 @@ function updateFillLayerColors() {
 
 /* POLYGON CLICK */
 
+// Selection worked, but could leave multiple polygons highlighted.
+// Used ChatGPT to simplify clearing the previous selection.
 function clearPreviousSelection() {
     if (currentlySelectedLayer !== null) {
         vegetationOutlineLayer.resetStyle(currentlySelectedLayer);
@@ -472,6 +491,8 @@ function handlePolygonClick(e) {
     updateETChart(polygonData, props);
 }
 
+// Click handling was functional but slightly messy before.
+// Used ChatGPT to keep interaction isolated to the outline layer.
 function attachClickListener(feature, layer) {
     layer.on({ click: handlePolygonClick });
 }
