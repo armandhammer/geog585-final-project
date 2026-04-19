@@ -261,6 +261,12 @@ Part 8 : COLLAPSIBLE LEGEND
     color: #222;
 }
 
+.legend,
+.legend-collapsed,
+.legend-expanded {
+    width: 260px;
+}
+
 .legend-header {
     display: flex;
     align-items: center;
@@ -313,18 +319,8 @@ Part 8 : COLLAPSIBLE LEGEND
     word-break: break-word;
 }
 
-/* collapsed state */
-.legend-collapsed {
-    width: 170px;
-}
-
 .legend-collapsed .legend-body {
     display: none;
-}
-
-/* expanded state */
-.legend-expanded {
-    width: 220px;
 }
 
 .legend-expanded .legend-body {
