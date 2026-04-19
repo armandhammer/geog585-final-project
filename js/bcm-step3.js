@@ -430,3 +430,273 @@ $(document).ready(function () {
     showDefaultInfoPanel();
     loadGeoJSONFile();
 });
+
+
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------------
+
+
+
+// Track which variable is currently being displayed
+var currentDisplayMode = "vegetation-community";
+
+// Color functions for each cover type
+function getTreeCoverColor(value) {
+    if (value >= 75) {
+        return "#00441b";
+    } else if (value >= 50) {
+        return "#1b7837";
+    } else if (value >= 25) {
+        return "#5aae61";
+    } else if (value >= 10) {
+        return "#a6dba0";
+    } else if (value > 0) {
+        return "#d9f0d3";
+    } else {
+        return "#f7fcf5";
+    }
+}
+
+function getShrubCoverColor(value) {
+    if (value >= 75) {
+        return "#7f2704";
+    } else if (value >= 50) {
+        return "#a63603";
+    } else if (value >= 25) {
+        return "#d94801";
+    } else if (value >= 10) {
+        return "#f16913";
+    } else if (value > 0) {
+        return "#fdae6b";
+    } else {
+        return "#fff5eb";
+    }
+}
+
+function getHerbCoverColor(value) {
+    if (value >= 75) {
+        return "#4d2c19";
+    } else if (value >= 50) {
+        return "#7f4f24";
+    } else if (value >= 25) {
+        return "#936639";
+    } else if (value >= 10) {
+        return "#b08968";
+    } else if (value > 0) {
+        return "#ddb892";
+    } else {
+        return "#f5ebe0";
+    }
+}
+
+// Decide which color to use for each polygon
+function getCurrentDisplayFillColor(feature) {
+
+    // Use original vegetation community colors
+    if (currentDisplayMode === "vegetation-community") {
+        var vegetationName = feature.properties[POLYGON_NAME_FIELD] || "Unknown";
+        return getVegetationColor(vegetationName);
+    }
+
+    // Get numeric value for selected field
+    var value = feature.properties[currentDisplayMode];
+
+    if (value === null || value === undefined || isNaN(value)) {
+        value = 0;
+    }
+
+    value = Number(value);
+
+    // Choose palette based on selected variable
+    if (currentDisplayMode === "Tot_Tree_Cov") {
+        return getTreeCoverColor(value);
+    }
+
+    if (currentDisplayMode === "Tot_Shrub_Cov") {
+        return getShrubCoverColor(value);
+    }
+
+    if (currentDisplayMode === "Tot_Herb_Cov") {
+        return getHerbCoverColor(value);
+    }
+
+    return "#cccccc";
+}
+
+// Update all polygon colors on the map
+function updateFillLayerForCurrentDisplayMode() {
+
+    if (!vegetationFillLayer) {
+        return;
+    }
+
+    vegetationFillLayer.eachLayer(function (layer) {
+        layer.setStyle({
+            fillColor: getCurrentDisplayFillColor(layer.feature),
+            fillOpacity: FILL_LAYER_OPACITY,
+            color: FILL_LAYER_OUTLINE_COLOR,
+            weight: FILL_LAYER_OUTLINE_WIDTH,
+            opacity: FILL_LAYER_OUTLINE_OPACITY
+        });
+    });
+
+    // Rebuild legend after colors change
+    addLegendForCurrentDisplayMode();
+}
+
+// Build legend content depending on selected variable
+function buildLegendBodyHtmlForCurrentMode() {
+
+    var html = '';
+
+    // Vegetation community legend (original)
+    if (currentDisplayMode === "vegetation-community") {
+        var categories = Object.keys(vegetationColorMap).sort();
+
+        categories.forEach(function (category) {
+            var color = vegetationColorMap[category];
+
+            html +=
+                '<div class="legend-item">' +
+                    '<span class="legend-color" style="background:' + color + ';"></span>' +
+                    '<span class="legend-label">' + category + '</span>' +
+                '</div>';
+        });
+
+        return html;
+    }
+
+    // Tree cover legend
+    if (currentDisplayMode === "Tot_Tree_Cov") {
+        html += '<div class="legend-item"><span class="legend-color" style="background:#f7fcf5;"></span><span class="legend-label">0%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#d9f0d3;"></span><span class="legend-label">0.1% to 9.9%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#a6dba0;"></span><span class="legend-label">10% to 24.9%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#5aae61;"></span><span class="legend-label">25% to 49.9%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#1b7837;"></span><span class="legend-label">50% to 74.9%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#00441b;"></span><span class="legend-label">75% and above</span></div>';
+        return html;
+    }
+
+    // Shrub cover legend
+    if (currentDisplayMode === "Tot_Shrub_Cov") {
+        html += '<div class="legend-item"><span class="legend-color" style="background:#fff5eb;"></span><span class="legend-label">0%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#fdae6b;"></span><span class="legend-label">0.1% to 9.9%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#f16913;"></span><span class="legend-label">10% to 24.9%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#d94801;"></span><span class="legend-label">25% to 49.9%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#a63603;"></span><span class="legend-label">50% to 74.9%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#7f2704;"></span><span class="legend-label">75% and above</span></div>';
+        return html;
+    }
+
+    // Herbaceous cover legend
+    if (currentDisplayMode === "Tot_Herb_Cov") {
+        html += '<div class="legend-item"><span class="legend-color" style="background:#f5ebe0;"></span><span class="legend-label">0%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#ddb892;"></span><span class="legend-label">0.1% to 9.9%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#b08968;"></span><span class="legend-label">10% to 24.9%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#936639;"></span><span class="legend-label">25% to 49.9%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#7f4f24;"></span><span class="legend-label">50% to 74.9%</span></div>';
+        html += '<div class="legend-item"><span class="legend-color" style="background:#4d2c19;"></span><span class="legend-label">75% and above</span></div>';
+        return html;
+    }
+
+    return html;
+}
+
+// Create legend with dropdown and dynamic content
+function addLegendForCurrentDisplayMode() {
+
+    if (vegetationLegend) {
+        vegetationLegend.remove();
+    }
+
+    vegetationLegend = L.control({ position: "topleft" });
+
+    vegetationLegend.onAdd = function () {
+
+        var div = L.DomUtil.create("div", "legend legend-collapsed");
+
+        var html = '';
+
+        html += '<div class="legend-header">';
+        html += '  <span class="legend-title">Map Display</span>';
+        html += '  <button type="button" class="legend-toggle-btn" id="legend-toggle-btn">Show</button>';
+        html += '</div>';
+
+        // Dropdown selector
+        html += '<div style="margin-top:8px;">';
+        html += '  <label for="legend-mode-select" style="display:block; font-weight:bold; margin-bottom:6px;">Display Variable</label>';
+        html += '  <select id="legend-mode-select" style="width:100%; padding:6px 8px; font-size:13px;">';
+        html += '      <option value="vegetation-community"' + (currentDisplayMode === "vegetation-community" ? ' selected' : '') + '>Vegetation Community</option>';
+        html += '      <option value="Tot_Tree_Cov"' + (currentDisplayMode === "Tot_Tree_Cov" ? ' selected' : '') + '>Tree Cover</option>';
+        html += '      <option value="Tot_Shrub_Cov"' + (currentDisplayMode === "Tot_Shrub_Cov" ? ' selected' : '') + '>Shrub Cover</option>';
+        html += '      <option value="Tot_Herb_Cov"' + (currentDisplayMode === "Tot_Herb_Cov" ? ' selected' : '') + '>Herbaceous Cover</option>';
+        html += '  </select>';
+        html += '</div>';
+
+        // Legend items
+        html += '<div class="legend-body" id="legend-body">';
+        html += buildLegendBodyHtmlForCurrentMode();
+        html += '</div>';
+
+        div.innerHTML = html;
+
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+
+        return div;
+    };
+
+    vegetationLegend.addTo(map);
+
+    // Attach events after legend is added to DOM
+    setTimeout(function () {
+
+        var toggleBtn = document.getElementById("legend-toggle-btn");
+        var legendBody = document.getElementById("legend-body");
+        var legendBox = document.querySelector(".legend");
+        var modeSelect = document.getElementById("legend-mode-select");
+
+        // Show / hide legend
+        if (toggleBtn && legendBody && legendBox) {
+            toggleBtn.addEventListener("click", function () {
+
+                var isCollapsed = legendBox.classList.contains("legend-collapsed");
+
+                if (isCollapsed) {
+                    legendBox.classList.remove("legend-collapsed");
+                    legendBox.classList.add("legend-expanded");
+                    toggleBtn.textContent = "Hide";
+                } else {
+                    legendBox.classList.remove("legend-expanded");
+                    legendBox.classList.add("legend-collapsed");
+                    toggleBtn.textContent = "Show";
+                }
+            });
+        }
+
+        // Dropdown change updates map + legend
+        if (modeSelect) {
+            modeSelect.addEventListener("change", function () {
+                currentDisplayMode = this.value;
+                updateFillLayerForCurrentDisplayMode();
+            });
+        }
+
+    }, 0);
+}
+
+// Initialize new legend after map loads
+$(document).ready(function () {
+    setTimeout(function () {
+        addLegendForCurrentDisplayMode();
+    }, 100);
+});
