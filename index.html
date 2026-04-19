@@ -29,6 +29,7 @@
     <script src="js/jquery.js"></script>
     <script src="js/leaflet.js"></script>
     <script src="js/d3.v7.js"></script>
+    <script src="js/bootstrap.js"></script>
 
     <!-- bcm.js loads last - it uses all the libraries above -->
     <script src="js/bcm-step2-updated.js"></script>
@@ -46,6 +47,18 @@
              #map-container needs position:relative so Leaflet controls position correctly.
              Leaflet draws the interactive map inside #map. -->
         <div id="map-container">
+            <div id="map-ui">
+                <label for="choropleth-select"><strong>Choropleth Variable:</strong></label>
+                <select id="choropleth-select">
+                    <option value="Tot_Tree_Cov">Tree Cover</option>
+                    <option value="Tot_Shrub_Cov">Shrub Cover</option>
+                    <option value="Tot_Herb_Cov">Herbaceous Cover</option>
+                </select>
+
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#aboutModal">
+                    About
+                </button>
+            </div>
             <div id="map"></div>
         </div>
 
@@ -111,7 +124,65 @@
 
     </div><!-- end #main-container -->
 
+    <div class="modal fade" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="aboutModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
 
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="aboutModalLabel">About This Project</h4>
+                </div>
+
+                <div class="modal-body">
+                    <h4>About the project</h4>
+                    <p>
+                        This web map app shows riparian ecosystem polygons in the Middle Rio Grande
+                        and allows users to explore vegetation cover and evapotranspiration trends.
+                        It can be used by students, researchers, planners, and other users who want
+                        to better understand riparian land cover patterns in the study area.
+                    </p>
+
+                    <h4>About the team</h4>
+                    <p>
+                        Team member: <a href="https://your-github-page-a.github.io/" target="_blank">Ben Garland</a>
+                        (bengarland@unm.edu)
+                    </p>
+                    <p>
+                        Team member: <a href="https://your-github-page-b.github.io/" target="_blank">Corrie Gonzalez/a>
+                        (cdreas88@unm.edu)
+                    </p>
+                    <p>
+                        Team member: <a href="https://your-github-page-b.github.io/" target="_blank">Meirah Williamson/a>
+                        (meirahw@unm.edu)
+                    </p>
+                    <p>
+                        Project advisor: <a href="https://www.lipingyang.org" target="_blank">Dr. Liping Yang</a>
+                        (course instructor of GEOG 485L/585L Interactive Web Mapping)
+                    </p>
+
+                    <h4>Acknowledgements</h4>
+                    <p>
+                        Dataset source:
+                        <a href="https://rgis.unm.edu/" target="_blank">RGIS at UNM</a>
+                    </p>
+                    <p>
+                        Example references:
+                        <a href="https://leafletjs.com/" target="_blank">Leaflet</a>,
+                        <a href="https://getbootstrap.com/docs/3.4/javascript/#modals" target="_blank">Bootstrap Modal
+                            Plugin</a>,
+                        <a href="https://d3js.org/" target="_blank">D3.js</a>
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 </body>
 
