@@ -337,4 +337,13 @@ Part 8 : COLLAPSIBLE LEGEND
     right: 15px;
     bottom: 15px;
     z-index: 1000;
+    display: block;
+    background-color: white;
+    color: #333;
+    border: 1px solid #999;
+    padding: 6px 12px;
+}
+
+#about-map-button:hover {
+    background-color: #f3f3f3;
 }
