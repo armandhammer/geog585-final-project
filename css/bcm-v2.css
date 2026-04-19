@@ -259,6 +259,7 @@ Part 8 : COLLAPSIBLE LEGEND
     font-size: 13px;
     line-height: 1.3;
     color: #222;
+    clear: both;
 }
 
 .legend,
