@@ -349,26 +349,12 @@ Part 8 : COLLAPSIBLE LEGEND
 
 /* ZOOM TO EXTENT BUTTON */
 
-/* Position container relative so we can offset inside it */
-.leaflet-top.leaflet-left {
-    position: relative;
-}
-
-/* Move button to the right of zoom controls */
-.zoom-data-control {
-    position: absolute;
-    top: 0;
-    left: 40px;   /* adjust if needed (width of zoom control) */
-    clear: none !important;
-}
-}
-
-/* Style button to match Leaflet controls */
 .zoom-data-btn {
+    display: block;
     height: 30px;
     padding: 0 10px;
-    border: 1px solid #ccc;
-    background: #fff;
+    border: none;
+    background: #ffffff;
     font-size: 12px;
     cursor: pointer;
     white-space: nowrap;
