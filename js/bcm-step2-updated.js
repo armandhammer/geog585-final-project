@@ -1,20 +1,15 @@
-/* ============================================================
-   bcm-step2.js  -  STEP 2: Polygon Selection + Info Panel
+/* bcm-step2-updated.js
 
-   What's new in this step:
-   - Clicking a polygon highlights it with a bold red outline
-   - Info panel fills in with vegetation type, cover %, and acreage
-   - Only one polygon can be selected at a time
-
-   Not yet included:
-   - ET chart
-   - Choropleth coloring
-   ============================================================ */
+   Features:
+   - Leaflet map with basemaps
+   - Choropleth based on dropdown selection
+   - Click polygons to update info panel
+   - ET chart updates on click
+   - Simple legend that updates with dropdown
+*/
 
 
-/* ============================================================
-   PART 1: SETTINGS
-   ============================================================ */
+// --------------------- SETTINGS ---------------------
 
 var GEOJSON_PATH = "./data/NMRipMap_MRG_Subset.geojson";
 
@@ -25,33 +20,38 @@ var MAP_START_LAT = 35.16514;
 var MAP_START_LON = -106.66186;
 var MAP_START_ZOOM = 16;
 
-var STUDY_LATITUDE_DEGREES = 35.1;
-
-// Uniform polygon style ------ Outline Only Layer symbology--These are for selected polys
+// outline layer (clickable)
 var POLYGON_FILL_COLOR = "transparent";
 var POLYGON_FILL_OPACITY = 0;
 var POLYGON_OUTLINE_COLOR = "#ffffff";
 var POLYGON_OUTLINE_WIDTH = 1.2;
 var POLYGON_OUTLINE_OPACITY = 1;
 
-////New Symbology for color coded community types:
-// Filled vegetation layer (toggle on/off, bottom layer)
+// fill layer (choropleth)
 var FILL_LAYER_OPACITY = 0.55;
 var FILL_LAYER_OUTLINE_COLOR = "transparent";
 var FILL_LAYER_OUTLINE_WIDTH = 0;
 var FILL_LAYER_OUTLINE_OPACITY = 0;
 
-// -----------------------------------------------
-// Style for the selected (clicked) polygon
+// selected polygon
 var SELECTED_OUTLINE_COLOR = "#ff0000";
 var SELECTED_OUTLINE_WIDTH = 4;
 var SELECTED_OUTLINE_OPACITY = 1.0;
 var SELECTED_FILL_OPACITY = 0.1;
-// -------------------------------------------------------------
 
+// dropdown state
+var currentChoroplethField = "Tot_Tree_Cov";
+
+var choroplethDisplayNames = {
+    Tot_Tree_Cov: "Tree Cover",
+    Tot_Shrub_Cov: "Shrub Cover",
+    Tot_Herb_Cov: "Herbaceous Cover"
+};
+
+// globals
 var map;
-var vegetationFillLayer; // - New layer
-var vegetationOutlineLayer; //This is my interactive layer that connects to chart and info panel 
+var vegetationFillLayer;
+var vegetationOutlineLayer;
 var currentlySelectedLayer = null;
 
 var layerControl;
@@ -59,44 +59,22 @@ var satelliteLayers;
 var simpleLayer;
 var vegetationLegend;
 
-var vegetationColorMap = {};
 
-// -- STEP 3 -- //
-
-//$(document).ready(function () {
-
-$.getScript("./js/mrw-charts.js", function () {
-    //   console.log( data ); // Data returned
-    //   console.log( textStatus ); // Success
-    //   console.log( jqxhr.status ); // 200
-    //   console.log( "Load was performed." );
-});
-//});
-
-/* ============================================================
-   PART 2: BUILDING THE MAP
-   ============================================================ */
+// --------------------- MAP SETUP ---------------------
 
 function createLeafletMap() {
     return L.map("map").setView([MAP_START_LAT, MAP_START_LON], MAP_START_ZOOM);
 }
 
 function createSatelliteBasemap() {
-
     var imagery = L.tileLayer(
         "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}",
-        {
-            attribution: "USGS",
-            maxZoom: 19
-        }
+        { attribution: "USGS", maxZoom: 19 }
     );
 
     var labels = L.tileLayer(
         "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
-        {
-            attribution: "Labels © Esri",
-            maxZoom: 19
-        }
+        { attribution: "Labels © Esri", maxZoom: 19 }
     );
 
     return {
@@ -105,8 +83,6 @@ function createSatelliteBasemap() {
     };
 }
 
-
-
 function createSimpleBasemap() {
     return L.tileLayer(
         "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
@@ -114,79 +90,50 @@ function createSimpleBasemap() {
     );
 }
 
-function addStartingBasemap(satelliteLayer) {
-    satelliteLayer.addTo(map);
-}
+function addLayerControl() {
+    if (layerControl) {
+        layerControl.remove();
+    }
 
-function addBasemapToggle(satelliteLayer, simpleLayer) {
-    L.control.layers(
-        { "Satellite": satelliteLayer, "Simple Map": simpleLayer },
-        {}
+    layerControl = L.control.layers(
+        {
+            "Satellite": satelliteLayers.imagery,
+            "Simple Map": simpleLayer
+        },
+        {
+            "Reference Labels": satelliteLayers.labels,
+            "Choropleth Layer": vegetationFillLayer
+        }
     ).addTo(map);
 }
 
-/* =================================================================
-HELPER FUNCTIONS For Drawing and Displaying GEOJSONs
-==================================================================*/
 
-function getColorPalette() {
-    return [
-        "#1b9e77",
-        "#d95f02",
-        "#7570b3",
-        "#e7298a",
-        "#66a61e",
-        "#e6ab02",
-        "#a6761d",
-        "#666666",
-        "#1f78b4",
-        "#b2df8a",
-        "#fb9a99",
-        "#fdbf6f",
-        "#cab2d6",
-        "#ffff99",
-        "#6a3d9a",
-        "#33a02c",
-        "#ff7f00",
-        "#a6cee3"
-    ];
+// --------------------- CHOROPLETH ---------------------
+
+function getChoroplethValue(feature) {
+    var value = feature.properties[currentChoroplethField];
+
+    if (value === null || value === undefined || isNaN(value)) {
+        return 0;
+    }
+
+    return Number(value);
 }
 
-function buildVegetationColorMap(geojsonData) {
-    var uniqueNames = [];
-
-    geojsonData.features.forEach(function (feature) {
-        var name = feature.properties[POLYGON_NAME_FIELD] || "Unknown";
-        if (!uniqueNames.includes(name)) {
-            uniqueNames.push(name);
-        }
-    });
-
-    uniqueNames.sort();
-
-    var palette = getColorPalette();
-
-    uniqueNames.forEach(function (name, index) {
-        vegetationColorMap[name] = palette[index % palette.length];
-    });
-
-    console.log("Vegetation color map built:", vegetationColorMap);
+function getChoroplethColor(value) {
+    if (value >= 75) return "#084081";
+    if (value >= 50) return "#0868ac";
+    if (value >= 25) return "#2b8cbe";
+    if (value >= 10) return "#4eb3d3";
+    if (value > 0) return "#7bccc4";
+    return "#f7fcf0";
 }
-
-function getVegetationColor(name) {
-    return vegetationColorMap[name] || "#cccccc";
-}
-
-
-/* ============================================================
-   PART 3: LOADING AND DISPLAYING THE GEOJSON
-   ============================================================ */
 
 function getFillLayerStyle(feature) {
-    var vegetationName = feature.properties[POLYGON_NAME_FIELD] || "Unknown";
+    var value = getChoroplethValue(feature);
 
     return {
-        fillColor: getVegetationColor(vegetationName),
+        fillColor: getChoroplethColor(value),
         fillOpacity: FILL_LAYER_OPACITY,
         color: FILL_LAYER_OUTLINE_COLOR,
         weight: FILL_LAYER_OUTLINE_WIDTH,
@@ -204,16 +151,25 @@ function getOutlineLayerStyle() {
     };
 }
 
-function addGeoJSONToMap(geojsonData) {
-    buildVegetationColorMap(geojsonData);
+function updateChoroplethStyle() {
+    if (!vegetationFillLayer) return;
 
-    // Bottom filled layer
+    vegetationFillLayer.eachLayer(function (layer) {
+        layer.setStyle(getFillLayerStyle(layer.feature));
+    });
+
+    addVegetationLegend();
+}
+
+
+// --------------------- GEOJSON ---------------------
+
+function addGeoJSONToMap(geojsonData) {
     vegetationFillLayer = L.geoJSON(geojsonData, {
         style: getFillLayerStyle,
         interactive: false
     });
 
-    // Top outline-only clickable layer
     vegetationOutlineLayer = L.geoJSON(geojsonData, {
         style: getOutlineLayerStyle,
         onEachFeature: attachClickListener
@@ -222,33 +178,20 @@ function addGeoJSONToMap(geojsonData) {
     vegetationFillLayer.addTo(map);
     vegetationOutlineLayer.addTo(map);
 
-//    map.fitBounds(vegetationOutlineLayer.getBounds());
-
-    console.log("GeoJSON loaded and both vegetation layers drawn.");
-
     addLayerControl();
     addVegetationLegend();
 }
 
-function addLayerControl() {
-    if (layerControl) {
-        layerControl.remove();
-    }
-
-    layerControl = L.control.layers(
-        {
-            "Satellite": satelliteLayers.imagery,
-            "Simple Map": simpleLayer
-        },
-        {
-            "Reference Layer Labels": satelliteLayers.labels,
-            "Color Coded Vegetation Communities": vegetationFillLayer
-        }
-    ).addTo(map);
+function loadGeoJSONFile() {
+    $.getJSON(GEOJSON_PATH, function (data) {
+        addGeoJSONToMap(data);
+    }).fail(function () {
+        alert("Could not load map data.");
+    });
 }
 
 
-///Add a legend for vegetationFillLayer
+// --------------------- LEGEND ---------------------
 
 function addVegetationLegend() {
     if (vegetationLegend) {
@@ -258,25 +201,23 @@ function addVegetationLegend() {
     vegetationLegend = L.control({ position: "topleft" });
 
     vegetationLegend.onAdd = function () {
-        var div = L.DomUtil.create("div", "legend legend-collapsed");
-        var categories = Object.keys(vegetationColorMap).sort();
+        var div = L.DomUtil.create("div", "legend");
+        var html = "";
 
-        var html = '';
-        html += '<div class="legend-header">';
-        html += '  <span class="legend-title">Vegetation Community</span>';
-        html += '  <button type="button" class="legend-toggle-btn" id="legend-toggle-btn">Show</button>';
-        html += '</div>';
+        html += "<div class='legend-header'>";
+        html += "<span class='legend-title'>" + choroplethDisplayNames[currentChoroplethField] + "</span>";
+        html += "</div>";
 
-        html += '<div class="legend-body" id="legend-body">';
-        categories.forEach(function (category) {
-            var color = vegetationColorMap[category];
-            html +=
-                '<div class="legend-item">' +
-                    '<span class="legend-color" style="background:' + color + ';"></span>' +
-                    '<span class="legend-label">' + category + '</span>' +
-                '</div>';
-        });
-        html += '</div>';
+        html += "<div class='legend-body' style='display:block; margin-top:8px;'>";
+
+        html += "<div class='legend-item'><span class='legend-color' style='background:#f7fcf0;'></span>0%</div>";
+        html += "<div class='legend-item'><span class='legend-color' style='background:#7bccc4;'></span>0.1 to 9.9%</div>";
+        html += "<div class='legend-item'><span class='legend-color' style='background:#4eb3d3;'></span>10 to 24.9%</div>";
+        html += "<div class='legend-item'><span class='legend-color' style='background:#2b8cbe;'></span>25 to 49.9%</div>";
+        html += "<div class='legend-item'><span class='legend-color' style='background:#0868ac;'></span>50 to 74.9%</div>";
+        html += "<div class='legend-item'><span class='legend-color' style='background:#084081;'></span>75%+</div>";
+
+        html += "</div>";
 
         div.innerHTML = html;
 
@@ -287,45 +228,10 @@ function addVegetationLegend() {
     };
 
     vegetationLegend.addTo(map);
-
-    setTimeout(function () {
-        var toggleBtn = document.getElementById("legend-toggle-btn");
-        var legendBody = document.getElementById("legend-body");
-        var legendBox = document.querySelector(".legend");
-
-        if (toggleBtn && legendBody && legendBox) {
-            toggleBtn.addEventListener("click", function () {
-                var isCollapsed = legendBox.classList.contains("legend-collapsed");
-
-                if (isCollapsed) {
-                    legendBox.classList.remove("legend-collapsed");
-                    legendBox.classList.add("legend-expanded");
-                    toggleBtn.textContent = "Hide";
-                } else {
-                    legendBox.classList.remove("legend-expanded");
-                    legendBox.classList.add("legend-collapsed");
-                    toggleBtn.textContent = "Show";
-                }
-            });
-        }
-    }, 0);
-}
-
-function loadGeoJSONFile() {
-    console.log("Loading GeoJSON from:", GEOJSON_PATH);
-
-    $.getJSON(GEOJSON_PATH, function (data) {
-        addGeoJSONToMap(data);
-    }).fail(function () {
-        console.error("Failed to load GeoJSON from:", GEOJSON_PATH);
-        alert("Could not load map data. Check the file path: " + GEOJSON_PATH);
-    });
 }
 
 
-/* ============================================================
-   PART 4: POLYGON SELECTION  -- NEW IN STEP 2
-   ============================================================ */
+// --------------------- POLYGON CLICK ---------------------
 
 function clearPreviousSelection() {
     if (currentlySelectedLayer !== null) {
@@ -352,24 +258,22 @@ function handlePolygonClick(e) {
     var props = clickedLayer.feature.properties;
     updateInfoPanel(props);
 
-    // ET line chart
-
     var polygonID = +props[GEOJSON_ID_FIELD];
     var polygonData = ETDataByPolygon.get(polygonID);
-    updateETChart(polygonData, props)
-    
+    updateETChart(polygonData);
 }
 
 function attachClickListener(feature, layer) {
     layer.on({ click: handlePolygonClick });
 }
 
-/* ============================================================
-   PART 5: INFO PANEL  -- NEW IN STEP 2
-   ============================================================ */
+
+// --------------------- INFO PANEL ---------------------
 
 function formatAsPercent(value) {
-    if (value === null || value === undefined) { return "--"; }
+    if (value === null || value === undefined || isNaN(value)) {
+        return "--";
+    }
     return parseFloat(value).toFixed(1) + "%";
 }
 
@@ -387,37 +291,56 @@ function updateInfoPanel(properties) {
     $("#info-tree").text(formatAsPercent(properties.Tot_Tree_Cov));
     $("#info-shrub").text(formatAsPercent(properties.Tot_Shrub_Cov));
     $("#info-herb").text(formatAsPercent(properties.Tot_Herb_Cov));
-    $("#info-acres").text(properties.Area_ac != null
-        ? Number(properties.Area_ac)
-            .toLocaleString(undefined, {
+
+    if (properties.Area_ac != null) {
+        $("#info-acres").text(
+            Number(properties.Area_ac).toLocaleString(undefined, {
                 minimumFractionDigits: 1,
                 maximumFractionDigits: 1
             }) + " acres"
-        : "Unknown"
-    );
+        );
+    } else {
+        $("#info-acres").text("Unknown");
+    }
 }
 
+
+// --------------------- ET CHART ---------------------
+
 function updateETChart(polygonData) {
+    if (!polygonData || polygonData.length === 0) {
+        $("#et-chart").html('<div class="et-placeholder">ET data is missing.</div>');
+        return;
+    }
 
-    // first clause is what all empty data looks like to my knowledge
-if (polygonData[0]["mean"] == 0 && isNaN(polygonData[1]["mean"]) || isNaN(polygonData[0]["mean"])&& isNaN(polygonData[1]["mean"]) ||
-        !polygonData || polygonData.length === 0) {
-        currentPolygon = null;
-        $("#et-chart").html('<div class="et-placeholder">ET data is missing. Select a different polygon to view its ET trends. </div>'); 
-        console.log("Data is missing", polygonData[0].PolyID);
-        
-    } else {
-        drawETChart(polygonData);
-    }       
-}   
+    if (
+        polygonData.length > 1 &&
+        (
+            (polygonData[0].mean == 0 && isNaN(polygonData[1].mean)) ||
+            (isNaN(polygonData[0].mean) && isNaN(polygonData[1].mean))
+        )
+    ) {
+        $("#et-chart").html('<div class="et-placeholder">ET data is missing.</div>');
+        return;
+    }
 
-/* ============================================================
-   PART 6: STARTUP
-   ============================================================ */
+    drawETChart(polygonData);
+}
 
+
+// --------------------- DROPDOWN ---------------------
+
+function setupChoroplethSelector() {
+    $("#choropleth-select").on("change", function () {
+        currentChoroplethField = $(this).val();
+        updateChoroplethStyle();
+    });
+}
+
+
+// --------------------- STARTUP ---------------------
 
 $(document).ready(function () {
-    console.log("Step 2: Polygon Selection + Info Panel");
 
     map = createLeafletMap();
 
@@ -428,5 +351,6 @@ $(document).ready(function () {
     satelliteLayers.labels.addTo(map);
 
     showDefaultInfoPanel();
+    setupChoroplethSelector();
     loadGeoJSONFile();
 });
